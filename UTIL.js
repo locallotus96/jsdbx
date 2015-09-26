@@ -611,8 +611,13 @@ UTIL.saveCollection = function (fd, collection) {
 }
 
 UTIL.loadCollection = function (fd, callback) {
+    if(!this.canReadWriteSync(fd)) {
+        console.log(':: Error Opening File! Check File Name or Permissions...');
+        callback(true);
+    }
+
     var rl = require('readline').createInterface({
-      input: fs.createReadStream(fd)
+        input: fs.createReadStream(fd)
     });
 
     rl.on('line', function (line) {
@@ -621,7 +626,7 @@ UTIL.loadCollection = function (fd, callback) {
     });
 
     rl.on('close', function () {
-        console.log(':: Closing File');
+        console.log(':: Done Reading Lines - Closing File');
         callback(true);
     });
 }
