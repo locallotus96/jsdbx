@@ -96,7 +96,7 @@ module.exports = function () {
             return true;
         } else { // oldKey isn't even here, insert newKey
             if(!remove) { // we're not here to delete this missing key
-                // insert the new key and [value] => object reference
+                // insert the new key and value => object reference
                 this.add(newKey, val);
                 return true;
             }
