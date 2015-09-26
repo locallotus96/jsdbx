@@ -3,7 +3,7 @@ var UTIL = require('./UTIL.js');
 
 DAL.FILE = 'collection.db';
 
-console.log('\n================LOADING COLLECTION======================');
+console.log('\n================ LOADING COLLECTION ======================');
 console.time(':: Load Time');
 DAL.load(function() {
     if(DAL.COLLECTION.length > 0) {
@@ -11,6 +11,7 @@ DAL.load(function() {
         console.timeEnd(':: Load Time');
         console.log('No. Documents:', DAL.count());
         test();
+        console.log('=== Tests Complete - Saving... ===');
         DAL.save();
     } else {
         for (var i = 0; i < 100000; i++) {
@@ -23,18 +24,12 @@ DAL.load(function() {
             });
         };
         test();
+        console.log('=== Tests Complete - Saving... ===');
         DAL.save();
     }
 });
 
 function test() {
-  console.log('\n======================================');
-  console.time(':: FindOne Time');
-  DAL.findOne({
-      name: DAL.COLLECTION[Math.floor(DAL.count() / 2)].name
-  });
-  console.timeEnd(':: FindOne Time');
-
   console.log('\n======================================');
   console.time(':: Index on name Time');
   DAL.createIndex('name');
@@ -47,45 +42,29 @@ function test() {
   });
   console.timeEnd(':: FindOne Time');
 
-  //var INDEXER = require('./INDEXER.js');
-
-  /*console.log('\n======================================');
-  console.log(INDEXER.INDECES['name'].contains(DAL.COLLECTION[DAL.count()-1].name));
-  console.log(INDEXER.INDECES['name'].get(DAL.COLLECTION[DAL.count()-1].name));
-  console.log(INDEXER.INDECES['name'].size());*/
-
   console.log('\n======================================');
   var oldName = DAL.COLLECTION[DAL.count()-1].name;
+  console.time(':: Update One Time');
   DAL.updateOne({name:oldName}, {name:'Bob'});
+  console.timeEnd(':: Update One Time');
   console.log('\n======================================');
+  console.time(':: Update One Time');
   DAL.updateOne({name:'Bob'}, {teacher:'Rudolf'});
-  console.log('\n======================================');
-  DAL.updateOne({name:'Foo10000'}, {name:'Bob'});
+  console.timeEnd(':: Update One Time');
 
   console.log('\n======================================');
   console.time(':: Index on teacher Time');
   DAL.createIndex('teacher');
   console.timeEnd(':: Index on teacher Time');
 
-  //console.log('\n======================================');
-  //console.time(':: Index on score Time');
-  //DAL.createIndex('score');
-  //console.timeEnd(':: Index on score Time');
+  console.time(':: Update One Time');
+  DAL.updateOne({teacher:'Rudolf'}, {name:'Julian'});
+  console.timeEnd(':: Update One Time');
 
   console.log('\n======================================');
-  console.time(':: Update Time');
-  DAL.updateOne({name:DAL.COLLECTION[DAL.count()-2].name}, {teacher:'Rudolf'});
-  console.timeEnd(':: Update Time');
-
-  console.log('\n======================================');
-  console.time(':: Update Time');
-  DAL.updateOne({name:DAL.COLLECTION[Math.floor(DAL.count()/2)].name}, {teacher:'Rudolf'});
-  console.timeEnd(':: Update Time');
-
-  console.log('\n======================================');
-  console.time(':: Remove Time');
+  console.time(':: Remove One Time');
   DAL.removeOne({score:'99998'});
-  console.timeEnd(':: Remove Time');
+  console.timeEnd(':: Remove One Time');
 
   console.log('\n======================================');
   console.time(':: Remove Time');
@@ -93,22 +72,11 @@ function test() {
   console.timeEnd(':: Remove Time');
 
   console.log('\n======================================');
-  console.time(':: Find Time');
+  console.time(':: Find Any Time');
   DAL.findAny({
       name: 'Bob',
       teacher: 'Rudolf',
       score: '99997'
   });
-  console.timeEnd(':: Find Time');
-
-  /*console.log('\n======================================');
-  console.log(INDEXER.INDECES['name'].contains(oldName));
-  console.log(INDEXER.INDECES['name'].get(oldName));
-  console.log(INDEXER.INDECES['name'].size());*/
-
-  /*console.log('\n======================================');
-  console.log(INDEXER.INDECES['name'].contains('Bob'));
-  console.log(INDEXER.INDECES['name'].get('Bob'));
-  console.log(INDEXER.INDECES['name'].size());*/
-
+  console.timeEnd(':: Find Any Time');
 }
