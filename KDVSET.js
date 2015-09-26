@@ -80,9 +80,9 @@ module.exports = function () {
                     if(val === p[i]) {
                         // remove reference with splice
                         p.splice(i, 1);
-                        // if this index contains no more values, remove it
+                        // if this key contains no more values, remove it
                         if(p.length === 0) {
-                            console.log(':: KDVSET Removing key', p);
+                            console.log(':: KDVSET.update Removing empty key', p);
                             this.remove(oldKey);
                         }
                         break;
@@ -96,7 +96,7 @@ module.exports = function () {
             return true;
         } else { // oldKey isn't even here, insert newKey
             if(!remove) {
-                // insert the new key and value => object reference
+                // insert the new key and [value] => object reference
                 this.add(newKey, val);
                 return true;
             }
