@@ -7,7 +7,7 @@ DAL.LOADING = false;
 DAL.COLLECTION = []; // documents / collection of javascript objects
 DAL.FILE = 'DB/collection.db';
 DAL.GLOBAL_DIFF = 0; // how many records have been inserted or altered since last collection save
-DAL.GLOBAL_DIFF_MAX = 100000;
+DAL.GLOBAL_DIFF_MAX = 1000000;
 /*
 DAL.INSERT_DIFF = 0; // how many records have been inserted since last insert write
 DAL.INSERT_DIFF_MAX = 50;
