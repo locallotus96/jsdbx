@@ -6,7 +6,6 @@ var DAL = {}; // data access layer object (class)
 DAL.LOADING = false;
 DAL.COLLECTION = []; // documents / collection of javascript objects
 DAL.FILE = 'collection.db';
-DAL.INDEX_FIELDS = [];
 DAL.GLOBAL_DIFF = 0; // how many records have been inserted or altered since last collection save
 DAL.GLOBAL_DIFF_MAX = 100000;
 /*
@@ -40,7 +39,6 @@ DAL.save = function () {
 
 DAL.createIndex = function (field) {
     if(UTIL.createIndex(field, this.COLLECTION)) {
-        this.INDEX_FIELDS.push(field);
         return true;
     } else {
         return false;
@@ -49,7 +47,6 @@ DAL.createIndex = function (field) {
 
 DAL.removeIndex = function (field) {
     if(UTIL.destroyIndex(field)) {
-        this.INDEX_FIELDS.splice(this.INDEX_FIELDS.indexOf(field), 1);
         return true;
     } else {
         return false;
@@ -218,10 +215,4 @@ DAL.removeAny = function (query) {
     return deleted;
 }
 
-/*
-exports.insertTestDocuments = DAL.insertTestDocuments;
-exports.findOne = DAL.findOne;
-exports.find = DAL.find;
-exports.count = DAL.count;
-*/
 module.exports = DAL;
