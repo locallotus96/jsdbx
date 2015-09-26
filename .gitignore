@@ -1,5 +1,5 @@
 node_modules
 info.txt
 DB
-TESTS/TEST.js
-TESTS/TEST2.js
+TEST/TEST.js
+TEST/TEST2.js
