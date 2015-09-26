@@ -5,7 +5,7 @@ var DAL = {}; // data access layer object (class)
 /* PRIVATE VARIABLES (not exported except for testing) */
 DAL.LOADING = false;
 DAL.COLLECTION = []; // documents / collection of javascript objects
-DAL.FILE = 'collection.txt';
+DAL.FILE = 'collection.db';
 DAL.INDEX_FIELDS = [];
 DAL.GLOBAL_DIFF = 0; // how many records have been inserted or altered since last collection save
 DAL.GLOBAL_DIFF_MAX = 100000;
@@ -20,10 +20,10 @@ DAL.DELETE_DIFF_MAX = 50;
 
 //--- DATA ACCESS LAYER
 
-DAL.load = function (fd, callback) {
+DAL.load = function (callback) {
     if(!this.LOADING) {
         this.LOADING = true;
-        UTIL.loadCollection(fd, function(done, line) {
+        UTIL.loadCollection(this.FILE, function(done, line) {
             if(done) {
                 this.LOADING = false;
                 callback();
@@ -34,8 +34,8 @@ DAL.load = function (fd, callback) {
     }
 }
 
-DAL.save = function (fd) {
-    UTIL.saveCollection(fd, this.COLLECTION);
+DAL.save = function () {
+    UTIL.saveCollection(this.FILE, this.COLLECTION);
 }
 
 DAL.createIndex = function (field) {

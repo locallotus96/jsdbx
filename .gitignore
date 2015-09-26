@@ -1,5 +1,6 @@
 node_modules
 collection.txt
 collection.txt.stream
+collection.db
 TEST.js
 TEST2.js

@@ -581,9 +581,13 @@ UTIL.saveCollection = function (fd, collection) {
     //this.resetFileSync(fd);
     //this.appendToFileSync(fd, collection);
 
+    if(!this.busyAppendingg && !this.busyStreaming) {
+        this.filterDeleted(collection);
+    }
+
     // ~8 seconds for 100 000 records
     // we need to clear the file before appending the collection again
-    if(!this.busyAppendingg) {
+    /*if(!this.busyAppendingg) {
         this.busyAppending = true;
         this.resetFileSync(fd);
         console.time(':: Append File Async Time');
@@ -593,19 +597,19 @@ UTIL.saveCollection = function (fd, collection) {
             console.timeEnd(':: Append File Async Time');
             console.log('File Size:', UTIL.getFilesizeInMBytes(fd));
         });
-    }
+    }*/
 
     // ~3 seconds for 100 000 records
     // streaming overwrites the file each time
     if(!this.busyStreaming) {
         this.busyStreaming = true;
-        console.log('<=> UTIL.saveCollection Streaming... File Size:', this.getFilesizeInMBytes(fd+'.stream'));
+        console.log('<=> UTIL.saveCollection Streaming... File Size:', this.getFilesizeInMBytes(fd));
         console.time(':: Write File Stream Time');
-        UTIL.streamToFile(fd+'.stream', collection, function(err) {
+        UTIL.streamToFile(fd, collection, function(err) {
             this.busyStreaming = false;
             console.log(':: Write File Stream Error:', err);
             console.timeEnd(':: Write File Stream Time');
-            console.log('File Size:', UTIL.getFilesizeInMBytes(fd+'.stream'));
+            console.log('File Size:', UTIL.getFilesizeInMBytes(fd));
         });
     }
 }
@@ -614,21 +618,21 @@ UTIL.loadCollection = function (fd, callback) {
     if(!this.isValidPathSync(fd) || !this.canReadWriteSync(fd)) {
         console.log(':: Error Opening File! Check File Name or Permissions...');
         callback(true, null);
+    } else {
+        var rl = require('readline').createInterface({
+            input: fs.createReadStream(fd)
+        });
+
+        rl.on('line', function (line) {
+            //console.log('Line from file:', line);
+            callback(false, JSON.parse(line));
+        });
+
+        rl.on('close', function () {
+            console.log(':: Done Reading Lines - Closing File');
+            callback(true);
+        });
     }
-
-    var rl = require('readline').createInterface({
-        input: fs.createReadStream(fd)
-    });
-
-    rl.on('line', function (line) {
-        //console.log('Line from file:', line);
-        callback(false, JSON.parse(line));
-    });
-
-    rl.on('close', function () {
-        console.log(':: Done Reading Lines - Closing File');
-        callback(true);
-    });
 }
 
 UTIL.readFromFileSync = function (fd) {
