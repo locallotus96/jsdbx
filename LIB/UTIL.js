@@ -288,7 +288,6 @@ UTIL.remover = function(collection, query, multi, matchAll) {
     return removed;
 }
 
-// TODO: Add full indexing support, updates the indices but doesn't find
 UTIL.updater = function(collection, query, data, multi, matchAll) {
     var rec = {};
     var updated = 0;
