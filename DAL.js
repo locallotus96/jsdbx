@@ -63,41 +63,12 @@ DAL.count = function () {
 /*
   data can be an object or an array of objects (1D or 2D array)
 */
-// TODO: Move insert implementation to UTIL object
-// Then remove UTIL.addIndex() function from UTIL
 DAL.insert = function (data) {
     var inserted = 0;
     if(typeof data !== 'object') {
         return 0; // invalid data
     }
-    if(data.length) { // assuming an array
-        var obj;
-        for(var i = 0; i < data.length; i++) {
-            obj = data[i];
-            // check if new object contains a field to index on
-            for(var i = 0; i < this.INDEX_FIELDS.length; i++) {
-                // ok there's a field to index on
-                if(this.INDEX_FIELDS[i] in obj) {
-                    // index this record
-                    UTIL.addIndex(this.INDEX_FIELDS[i], obj);
-                }
-            }
-            // check for [[obj,obj,],]
-            if(obj.length > 0) {
-                this.COLLECTION.concat(UTIL.addIDProperty(obj)); // array of objects hopefully
-                inserted++;
-            } else if(typeof obj === 'object') {
-                this.COLLECTION.push(UTIL.addIDProperty(obj));
-                inserted++;
-            } else {
-                // invalid data encountered
-                console.error(':: DAL.insert Error in record(s) to insert!');
-            }
-        }
-    } else { // single object
-        this.COLLECTION.push(UTIL.addIDProperty(data));
-        inserted++;
-    }
+    inserted = UTIL.inserter(this.COLLECTION, data);
     this.GLOBAL_DIFF += inserted;
     if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
           UTIL.saveCollection(this.FILE, this.COLLECTION);

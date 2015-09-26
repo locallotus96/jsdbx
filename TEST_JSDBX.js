@@ -7,7 +7,6 @@ console.log('\n================ LOADING COLLECTION ======================');
 console.time(':: Load Time');
 DAL.load(function() {
     if(DAL.COLLECTION.length > 0) {
-        console.error('COLLECTION LOADED!');
         console.timeEnd(':: Load Time');
         console.log('No. Documents:', DAL.count());
         test();

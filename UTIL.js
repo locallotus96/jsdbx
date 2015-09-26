@@ -7,19 +7,6 @@ UTIL.INDEXER = require('./INDEXER.js');
 
 //--- UTILITIES
 
-UTIL.listContains = function (list, obj) {
-    for(var i = 0; i < list.length; i++) {
-        if(list[i] === obj) {
-            return true;
-        }
-    }
-    return false;
-}
-
-UTIL.getObjectSize = function (obj) {
-    return Object.keys(obj).length;
-}
-
 // Add the _id property to each object
 UTIL.addIDProperty = function (obj) {
     if(obj.length) { // assuming an array
@@ -48,8 +35,46 @@ UTIL.destroyIndex = function (field) {
     return this.INDEXER.destroy(field);
 }
 
-UTIL.addIndex = function (field, obj) {
-    this.INDEXER.add(field, obj);
+/*
+  data can be an object or an array of objects (1D or 2D array)
+*/
+UTIL.inserter = function(collection, data) {
+    var inserted = 0;
+    if(data.length) { // assuming an array
+        var obj = {};
+        for(var i = 0; i < data.length; i++) {
+            obj = data[i];
+            // check if new object contains a field to index on
+            for(p in INDEXER.INDECES) {
+                // ok there's a field to index on
+                if(p in obj) {
+                    // index this record
+                    this.INDEXER.add(p, obj);
+                }
+            }
+            /*for(var i = 0; i < this.INDEX_FIELDS.length; i++) {
+                // ok there's a field to index on
+                if(this.INDEX_FIELDS[i] in obj) {
+                    // index this record
+                    UTIL.addIndex(this.INDEX_FIELDS[i], obj);
+                }
+            }*/
+            // check for [[obj,obj,],]
+            if(obj.length > 0) {
+                collection.concat(this.addIDProperty(obj)); // array of objects hopefully
+                inserted++;
+            } else if(typeof obj === 'object') {
+                collection.push(this.addIDProperty(obj));
+                inserted++;
+            } else {
+                // invalid data encountered
+                console.error(':: DAL.insert Error in record(s) to insert!');
+            }
+        }
+    } else { // single object
+        collection.push(this.addIDProperty(data));
+        inserted++;
+    }
 }
 
 /*
@@ -384,6 +409,20 @@ UTIL.filterDeleted = function (list) {
         }
     }
     return list;
+}
+
+// Method to return whether or not a list contains an object
+UTIL.listContains = function (list, obj) {
+    for(var i = 0; i < list.length; i++) {
+        if(list[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
+UTIL.getObjectSize = function (obj) {
+    return Object.keys(obj).length;
 }
 
 /*
@@ -811,39 +850,5 @@ UTIL.getFilesizeInMBytes = function (fd) {
         return false;
     }
 }
-
-/*
-UTIL.updateCollectionFile = function (fd, id) {
-    console.log('Updating Document with ID:', id);
-    for(var i = 0; i < DAL.bufferIndex.length; i++) {
-        if(DAL.bufferIndex[i]._id == id) {
-            console.log('Found at index:', i)
-            console.log('First Byte is at:', DAL.bufferIndex[i].firstByte);
-            console.log('Last Byte is at:', DAL.bufferIndex[i].lastByte);
-            console.log('Byte Length of Document:', DAL.bufferIndex[i].length);
-            // fs.write(fd, buffer, offset, length[, position], callback)
-            // fs.write(fd, data[, position[, encoding]], callback)
-            // fs.writeSync(fd, buffer, offset, length[, position])
-            // fs.writeSync(fd, data[, position[, encoding]])
-            var position = DAL.bufferIndex[i].firstByte;
-            fs.open(fd, 'r+', function(err, fd) {
-                if(err) {
-                    console.error('Error Opening File for Updating!', err);
-                    throw err;
-                }
-                fs.write(fd, JSON.stringify({testDocument: 'TestDocument'}), position, 'utf8', function (err, written, string) {
-                    if(err) {
-                      console.log('Error while updating collection file:', err);
-                      throw err;
-                    }
-                    console.log('Started Writing at:', position);
-                    console.log('Written', written + ' bytes');
-                    console.log(string);
-                });
-            });
-        }
-    }
-}
-*/
 
 module.exports = UTIL;
