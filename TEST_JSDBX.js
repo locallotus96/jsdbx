@@ -12,12 +12,13 @@ console.time(':: Load Time');
         teacher: 'Tim'
     });
 };*/
-DAL.load('2collection.txt', function() {
-    console.error('COLLECTION LOADED!');
-    console.timeEnd(':: Load Time');
-    console.log('No. Documents:', DAL.count());
-    if(DAL.COLLECTION.length > 0)
+DAL.load('collection.txt', function() {
+    if(DAL.COLLECTION.length > 0) {
+        console.error('COLLECTION LOADED!');
+        console.timeEnd(':: Load Time');
+        console.log('No. Documents:', DAL.count());
         loaded();
+    }
 });
 
 function loaded() {

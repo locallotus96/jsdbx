@@ -611,9 +611,9 @@ UTIL.saveCollection = function (fd, collection) {
 }
 
 UTIL.loadCollection = function (fd, callback) {
-    if(!this.canReadWriteSync(fd)) {
+    if(!this.isValidPathSync(fd) || !this.canReadWriteSync(fd)) {
         console.log(':: Error Opening File! Check File Name or Permissions...');
-        callback(true);
+        callback(true, null);
     }
 
     var rl = require('readline').createInterface({
