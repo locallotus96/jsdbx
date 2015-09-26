@@ -1,7 +1,7 @@
-var DAL = require('./DAL.js');
-var UTIL = require('./UTIL.js');
+var DAL = require('../LIB/DAL.js');
+var UTIL = require('../LIB/UTIL.js');
 
-DAL.FILE = 'collection.db';
+DAL.FILE = 'DB/collection.db';
 
 console.log('\n================ LOADING COLLECTION ======================');
 console.time(':: Load Time');

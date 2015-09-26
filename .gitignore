@@ -1,7 +1,5 @@
 node_modules
 info.txt
-collection.txt
-collection.txt.stream
-collection.db
-TEST.js
-TEST2.js
+DB
+TESTS/TEST.js
+TESTS/TEST2.js

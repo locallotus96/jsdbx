@@ -5,7 +5,7 @@ var DAL = {}; // data access layer object (class)
 /* PRIVATE VARIABLES (not exported except for testing) */
 DAL.LOADING = false;
 DAL.COLLECTION = []; // documents / collection of javascript objects
-DAL.FILE = 'collection.db';
+DAL.FILE = 'DB/collection.db';
 DAL.GLOBAL_DIFF = 0; // how many records have been inserted or altered since last collection save
 DAL.GLOBAL_DIFF_MAX = 100000;
 /*
