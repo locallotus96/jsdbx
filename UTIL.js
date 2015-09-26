@@ -15,7 +15,7 @@ UTIL.addIDProperty = function (obj) {
                 obj[i]._id = uuid.v4().replace(/-/g, '');
         }
         return obj;
-    } else {
+    } else { // single object
         if(!obj['_id'])
             obj._id = uuid.v4().replace(/-/g, '')
         return obj;
@@ -60,10 +60,10 @@ UTIL.inserter = function(collection, data) {
                 }
             }*/
             // check for [[obj,obj,],]
-            if(obj.length > 0) {
-                collection.concat(this.addIDProperty(obj)); // array of objects hopefully
-                inserted++;
-            } else if(typeof obj === 'object') {
+            if(obj.length > 0) { // array of objects hopefully
+                collection.concat(this.addIDProperty(obj));
+                inserted += obj.length;
+            } else if(typeof obj === 'object') { // single object
                 collection.push(this.addIDProperty(obj));
                 inserted++;
             } else {
@@ -75,6 +75,7 @@ UTIL.inserter = function(collection, data) {
         collection.push(this.addIDProperty(data));
         inserted++;
     }
+    return inserted;
 }
 
 /*
