@@ -614,7 +614,7 @@ UTIL.deduplicate = function (collection) {
     return collection;
 }
 
-//--- FILE OPERATIONS
+//--- FILE OPERATIONS ===================================================
 
 UTIL.busyAppending = false; // are we currently appending to the file?
 UTIL.busyStreaming = false; // are we currently streaming to the file?
