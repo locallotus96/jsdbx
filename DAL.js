@@ -61,11 +61,10 @@ DAL.count = function () {
   data can be an object or an array of objects (1D or 2D array)
 */
 DAL.insert = function (data) {
-    var inserted = 0;
     if(typeof data !== 'object') {
         return 0; // invalid data
     }
-    inserted = UTIL.inserter(this.COLLECTION, data);
+    var inserted = UTIL.inserter(this.COLLECTION, data);
     this.GLOBAL_DIFF += inserted;
     if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
           UTIL.saveCollection(this.FILE, this.COLLECTION);
