@@ -521,6 +521,7 @@ UTIL.partition = function (collection, field, left, right) {
     collection (array of objects) is sorted in place
     field (string) is the property of each object by which to sort on eg: '_id'
 */
+// TODO: Does it still work?
 UTIL.quickSort = function (collection, field, left, right) {
     var index;
     if(collection.length > 1) {
@@ -547,6 +548,7 @@ UTIL.quickSort = function (collection, field, left, right) {
   Similar to bubble sort,it uses two loops to accomplish the task,
   ultimately resulting in the O(n2) complexity.
 */
+// TODO: Does it still work?
 UTIL.selectionSort = function (collection, field) {
     var len = collection.length;
     var min, i, j;
@@ -556,7 +558,6 @@ UTIL.selectionSort = function (collection, field) {
         //check the rest of the array to see if anything is smaller
         for(j = i+1; j < len; j++) {
             if(collection[j][field] < collection[min][field]) {
-                console.log('Smaller');
                 min = j;
             }
         }
