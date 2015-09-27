@@ -59,7 +59,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
-  db[cName].findAny({ nsame: 'Buffer50000', sscore: 99650 });
+  db[cName].findAny({ name: 'Buffer50000', score: 99650 });
   console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
