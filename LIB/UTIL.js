@@ -94,7 +94,6 @@ UTIL.finder = function(collection, query, multi, matchAll) {
     var rec = {};
     var match = false; // whether or not a record matches the query
     var indexed = false; // are any keys in the query indexed?
-    var indexedKeys = []; // all the keys indexed on
     var keysNotIndexed = []; // all search keys that were not found in the index
     var indexedRecs = []; // holding records returned from indexer
     console.log('UTIL.finder Finding with Query:', JSON.stringify(query) + ' Multi:', multi + ' MatchAllFields:', matchAll);
@@ -127,10 +126,6 @@ UTIL.finder = function(collection, query, multi, matchAll) {
                     }
                 }
             }
-            // this might trigger a normal search on the remaining keys
-            if(multi) {
-                indexedKeys.push(p);
-            }
         } else {
             keysNotIndexed.push(p);
         }
@@ -140,7 +135,7 @@ UTIL.finder = function(collection, query, multi, matchAll) {
     //--- Ok we have fields to search on that were not indexed
     // This is due to matchAll AND a field not indexed
     // Or no indexed fields at all
-    if((!indexed || keysNotIndexed.length > 0) && (keysNotIndexed.length != indexedKeys.length)) {
+    if(keysNotIndexed.length > 0) {
         if(!indexed) {
             console.log('=> No query field(s) are indexed!');
         } else {
@@ -187,7 +182,6 @@ UTIL.remover = function(collection, query, multi, matchAll) {
     var removed = 0;
     var match = false;
     var indexed = false; // are any keys in the query indexed?
-    var indexedKeys = []; // all the keys indexed on
     var keysNotIndexed = []; // all search keys that were not found in the index
     var indexedRecs = []; // holding records returned from indexer
     console.log('UTIL.remover Removing with Query:', JSON.stringify(query) + ' Multi:', multi + ' MatchAllFields:', matchAll);
@@ -234,17 +228,13 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                     }
                 }
             }
-            // this might trigger a normal search on the remaining keys
-            if(multi) {
-                indexedKeys.push(p);
-            }
         } else {
             keysNotIndexed.push(p);
         }
     }
     // END INDEX SEARCH
 
-    if((!indexed || keysNotIndexed.length > 0) && (keysNotIndexed.length != indexedKeys.length)) {
+    if(keysNotIndexed.length > 0) {
         if(!indexed) {
             console.log('=> No query field(s) are indexed!');
         } else {
@@ -294,7 +284,6 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
     var updated = 0;
     var match = false;
     var indexed = false; // are any keys in the query indexed?
-    var indexedKeys = []; // all the keys indexed on
     var keysNotIndexed = []; // all search keys that were not found in the index
     var indexedRecs = []; // holding records returned from indexer
     console.log('UTIL.updater Finding with Query:', JSON.stringify(query) + ' Multi:', multi + ' MatchAllFields:', matchAll);
@@ -333,17 +322,13 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
                     }
                 }
             }
-            // this might trigger a normal search on the remaining keys
-            if(multi) {
-                indexedKeys.push(p);
-            }
         } else {
             keysNotIndexed.push(p);
         }
     }
     // END INDEX SEARCH
 
-    if((!indexed || keysNotIndexed.length > 0) && (keysNotIndexed.length != indexedKeys.length)) {
+    if(keysNotIndexed.length > 0) {
         if(!indexed) {
             console.log('=> No query field(s) are indexed!');
         } else {
