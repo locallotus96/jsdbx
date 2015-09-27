@@ -18,9 +18,9 @@ db = require('./LIB/JSDBX.js')
 db.connect(collection, callback)  
 db.disconnect(collection, callback)
 
-db.collection => load(callback)  
-db.collection => save(callback)  
-db.collection ===> createIndex(key)  
+db.collection => load(callback) // used by db.connect()
+db.collection => save(callback) // used by db.disconnect()
+db.collection ===> createIndex(key) // key is a string of field/property name to index on
 db.collection ===> removeIndex(key)  
 db.collection =====> insert(data)  
 db.collection =======> find(query)  
@@ -40,5 +40,5 @@ db.collection =============> count()
 ### Architecture:
 
 <=> JSDBX  
-  :: => new UTIL  
-  :: <=> new DAL(UTIL) => UTIL => INDEXER => new KDVSET  
+    :: => new UTIL  
+    :: <=> new DAL(UTIL) => UTIL => INDEXER => new KDVSET  
