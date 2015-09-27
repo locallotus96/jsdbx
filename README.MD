@@ -13,6 +13,8 @@
 
 ### API:
 
+db = require('./LIB/JSDBX.js')
+
 db.connect(collection, callback)  
 db.disconnect(collection, callback)
 
