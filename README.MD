@@ -27,7 +27,7 @@ callback takes an err parameter to signal successful connection/disconnection or
 > db.disconnect(path, collection, callback)
 
 #### Don't call these methods from db.collection unless you're hacking
-###### (mind the other exposed vars as well)   
+###### (mind the other exposed vars as well)
 used by db.connect()  
 > db.collection => load(callback)  
 
@@ -62,6 +62,8 @@ data is an object of keys/values to merge with a matching object
 > db.collection ===========> removeOne(query)  
 > db.collection ===========> removeAny(query)  
 > db.collection ===========> removeAnyOne(query)  
+
+#### Total records
 > db.collection =============> count()  
 
 ### Architecture:
