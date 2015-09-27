@@ -45,7 +45,7 @@ UTIL.inserter = function(collection, data) {
         for(var i = 0; i < data.length; i++) {
             obj = data[i];
             // check if new object contains a field to index on
-            for(p in INDEXER.INDECES) {
+            for(p in this.INDEXER.INDECES) {
                 // ok there's a field to index on
                 if(p in obj) {
                     // index this record
@@ -617,7 +617,7 @@ UTIL.deduplicate = function (collection) {
 
 UTIL.busyAppending = false; // are we currently appending to the file?
 UTIL.busyStreaming = false; // are we currently streaming to the file?
-UTIL.saveCollection = function (fd, collection) {
+UTIL.saveCollection = function (fd, collection, callback) {
     //this.resetFileSync(fd);
     //this.appendToFileSync(fd, collection);
 
@@ -650,6 +650,7 @@ UTIL.saveCollection = function (fd, collection) {
             console.log(':: Write File Stream Error:', err);
             console.timeEnd(':: Write File Stream Time');
             console.log('File Size:', UTIL.getFilesizeInMBytes(fd));
+            callback(err);
         });
     }
 }
@@ -770,16 +771,6 @@ UTIL.streamFromFile = function (fd, callback) {
     });
 }
 
-UTIL.removeFileAsync = function (fd, callback) {
-    fs.unlink(fd, function(err) {
-        if(err) {
-            callback(true);
-        } else {
-            callback(false);
-        }
-    });
-}
-
 UTIL.removeFileSync = function (fd) {
     if(fs.unlinkSync(fd)) {
         return true;
@@ -788,24 +779,8 @@ UTIL.removeFileSync = function (fd) {
     }
 }
 
-UTIL.resetFileSync = function (fd) {
-    fs.writeFileSync(fd, '', 'utf8');
-}
-
-// check if file is visible to calling process
-UTIL.isValidPathAsync = function (path, callback) {
-    fs.access(path, fs.F_OK, function(err) {
-        if(err) {
-            callback(true);
-        } else {
-            callback(false);
-        }
-    });
-}
-
-// check read and write permissions
-UTIL.canReadWriteAsync = function (path, callback) {
-    fs.access(path, fs.R_OK | fs.W_OK, function(err) {
+UTIL.removeFileAsync = function (fd, callback) {
+    fs.unlink(fd, function(err) {
         if(err) {
             callback(true);
         } else {
@@ -824,6 +799,23 @@ UTIL.isValidPathSync = function (path) {
     return true;
 }
 
+// check if file is visible to calling process
+UTIL.isValidPathAsync = function (path, callback) {
+    fs.access(path, fs.F_OK, function(err) {
+        if(err) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+    });
+}
+
+// abstraction for exposed function
+UTIL.isValidPath = function (path) {
+    return this.isValidPathSync(path);
+}
+
+
 // check read and write permissions
 UTIL.canReadWriteSync = function (path) {
       try {
@@ -832,6 +824,27 @@ UTIL.canReadWriteSync = function (path) {
           return false;
       }
       return true;
+}
+
+// check read and write permissions
+UTIL.canReadWriteAsync = function (path, callback) {
+    fs.access(path, fs.R_OK | fs.W_OK, function(err) {
+        if(err) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+    });
+}
+
+UTIL.resetFileSync = function (fd) {
+    //fs.writeFileSync(fd, '', 'utf8', {encoding: 'utf8', flag: 'a');
+    fs.writeFile(fd, '', 'utf8', function(err) {
+        if(err) {
+            console.error(err);
+            throw err;
+        }
+    });
 }
 
 UTIL.getFilesizeInBytes = function (fd) {
