@@ -633,11 +633,12 @@ UTIL.saveCollection = function (fd, collection, callback) {
     if(!this.busyStreaming) {
         this.filterDeleted(collection);
         this.busyStreaming = true;
-        console.log('<=> UTIL.saveCollection Streaming... File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> UTIL.saveCollection Streaming... Old File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> Saving File:', fd);
         console.time('<=> Write File Stream Time');
         UTIL.streamToFile(fd, collection, function(err) {
             UTIL.busyStreaming = false;
-            console.log('<=> Write File Stream Error:', err + ' File Size:', UTIL.getFilesizeInMBytes(fd));
+            console.log('<=> Write File Stream Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
             console.timeEnd('<=> Write File Stream Time');
             callback(err);
         });
@@ -652,6 +653,7 @@ UTIL.loadCollection = function (fd, callback) {
         console.log(':: Error Opening File! Check File Name or Permissions...');
         callback(true);
     } else {
+        console.log('<=> UTIL.loadCollection Streaming... Old File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Loading File:', fd);
         console.time('<=> Read File Stream Time');
         this.streamFromFile(fd, function(err, data) {
@@ -661,9 +663,10 @@ UTIL.loadCollection = function (fd, callback) {
                     console.log('<=> Loaded Collection:', data.length + ' records');
                     callback(null, data);
                 } else {
-                    callback(false); // no error but no data either
+                    callback(null, null); // no error but no data either
                 }
             } else {
+                console.log('<=> Read File Stream Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
                 callback(err);
             }
         });
@@ -770,7 +773,7 @@ UTIL.streamFromFile = function (fd, callback) {
         if(data) {
             callback(null, JSON.parse(data));
         } else {
-            callback(null, null);
+            callback(null, {});
         }
     });
     rstream.on('data', function(chunk) {
