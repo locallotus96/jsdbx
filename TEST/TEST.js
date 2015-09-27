@@ -37,6 +37,11 @@ function test() {
   db[cName].findOne({ age: 100 });
   console.timeEnd(':: Find One Time');
 
+  //console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  //console.time(':: Remove Index on age Time');
+  //db[cName].removeIndex('age');
+  //console.timeEnd(':: Remove Index on age Time');
+
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
   db[cName].findAny({ name: 'Buffer50000', score: 99650, teacher: 'None', age: 50 });
@@ -46,6 +51,11 @@ function test() {
   console.time(':: Create Index on score Time');
   db[cName].createIndex('score');
   console.timeEnd(':: Create Index on score Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find Any Time');
+  db[cName].findAny({ name: 'Buffer50000', score: 99650, teacher: 'None', age: 50, surname: 'Underrun66000', city: 'None' });
+  console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
