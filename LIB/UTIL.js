@@ -629,19 +629,6 @@ UTIL.saveCollection = function (fd, collection, callback) {
         return;
     }
 
-    // we need to clear the file before appending the collection again
-    /*if(!this.busyAppendingg) {
-        this.busyAppending = true;
-        this.resetFileSync(fd);
-        console.time(':: Append File Async Time');
-        this.appendToFileAsync(fd, collection, function(err) {
-            this.busyAppending = false;
-            console.log(':: Append File Async Error', err);
-            console.timeEnd(':: Append File Async Time');
-            console.log('File Size:', UTIL.getFilesizeInMBytes(fd));
-        });
-    }*/
-
     // streaming overwrites the file each new stream
     if(!this.busyStreaming) {
         this.filterDeleted(collection);
@@ -650,9 +637,8 @@ UTIL.saveCollection = function (fd, collection, callback) {
         console.time('<=> Write File Stream Time');
         UTIL.streamToFile(fd, collection, function(err) {
             UTIL.busyStreaming = false;
-            console.log('<=> Write File Stream Error:', err);
+            console.log('<=> Write File Stream Error:', err + ' File Size:', UTIL.getFilesizeInMBytes(fd));
             console.timeEnd('<=> Write File Stream Time');
-            console.log('<=> File Size:', UTIL.getFilesizeInMBytes(fd));
             callback(err);
         });
     } else {
@@ -778,15 +764,13 @@ UTIL.streamFromFile = function (fd, callback) {
     rstream.on('error', function(err) {
         console.error(':: Error reading from file stream!', err);
         callback(err, null);
-        throw err;
     });
     rstream.on('end', function() {
         console.log('<=> Done reading from file stream!');
         if(data) {
             callback(null, JSON.parse(data));
         } else {
-            // should not return some empty object {} or [] because of UTIL.inserter performing data length check / detecting a valid object
-            callback(null, {});
+            callback(null, null);
         }
     });
     rstream.on('data', function(chunk) {
