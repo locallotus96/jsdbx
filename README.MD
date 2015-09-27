@@ -1,7 +1,7 @@
 # JavaScript DBX
 ## A json object database in node.js
 
-> Supports indexing on any field(s) for fast searches
+> Supports indexing on any field(s) for faster searches
   - Indices are dynamically maintained
 
 > Supports queries on multiple fields:  
