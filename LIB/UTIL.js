@@ -658,7 +658,7 @@ UTIL.saveCollection = function (fd, collection, callback) {
         console.log('<=> UTIL.saveCollection Streaming... File Size:', this.getFilesizeInMBytes(fd));
         console.time('<=> Write File Stream Time');
         UTIL.streamToFile(fd, collection, function(err) {
-            UTIL.busyStreaming = false;
+            UTIL.busyStreaming = true;
             console.log('<=> Write File Stream Error:', err);
             console.timeEnd('<=> Write File Stream Time');
             console.log('<=> File Size:', UTIL.getFilesizeInMBytes(fd));
@@ -763,12 +763,11 @@ UTIL.streamToFile = function (fd, data, callback) {
     var wstream = fs.createWriteStream(fd);
     wstream.on('error', function(err) {
         console.error(':: Error writing to file stream!', err);
-        callback(null); // signal error to callback
-        throw err;
+        callback(err); // signal error to callback
     });
     wstream.on('finish', function() {
         console.log('<=> Done writing to file stream!');
-        callback(null); // signal done to callback
+        callback(false); // signal done to callback with no error
     });
     //for(var i = 0; i < data.length; i++) {
         //wstream.write(JSON.stringify(data[i]) + '\n');

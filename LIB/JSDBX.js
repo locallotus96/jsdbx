@@ -60,7 +60,6 @@ var db = {
                 if(err) {
                     console.error('<DB> Error saving collection', err);
                     callback(err);
-                    throw err;
                 }
                 console.log('<DB> Collection saved! Clearing memory and disconnecting...');
                 db[collection] = undefined;
