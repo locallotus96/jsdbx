@@ -27,7 +27,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Insert Time');
-  for (var i = 0; i < 1750000; i++) {
+  for (var i = 0; i < 100000; i++) {
       db[cName].insert({
           name: 'Buffer' + i,
           surname: 'Underrun' + i,
