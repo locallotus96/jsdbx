@@ -1,3 +1,4 @@
+'use strict';
 /*
   Key Duplicate Value Store
   A key/value store implementation where values are stored in an array

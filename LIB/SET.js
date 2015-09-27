@@ -1,3 +1,4 @@
+'use strict';
 /*
   An unordered collection of unique elements built for fast membership testing, insertion and removal.
 

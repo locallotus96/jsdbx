@@ -23,4 +23,4 @@ console.timeEnd(':: Insert Time');
 console.log('<DB> Records:', db.test.count());
 
 console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-console.log(db.disconnect('test'));
+db.disconnect('test');

@@ -1,3 +1,4 @@
+'use strict';
 var KDVSET = require('./KDVSET');
 
 var INDEXER = {};

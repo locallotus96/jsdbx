@@ -1,3 +1,4 @@
+'use strict';
 //--- Binary Search Tree Implementation, index on document._id
 BST = {};
 BST._root = null;

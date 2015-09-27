@@ -1,3 +1,4 @@
+'use strict';
 /*
   Key Value Store
   A key/value store implementation

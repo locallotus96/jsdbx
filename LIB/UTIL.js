@@ -1,3 +1,4 @@
+'use strict';
 var fs = require('fs');
 var uuid = require('node-uuid');
 var merge = require('merge');
@@ -646,7 +647,7 @@ UTIL.saveCollection = function (fd, collection, callback) {
         console.log('<=> UTIL.saveCollection Streaming... File Size:', this.getFilesizeInMBytes(fd));
         console.time(':: Write File Stream Time');
         UTIL.streamToFile(fd, collection, function(err) {
-            this.busyStreaming = false;
+            UTIL.busyStreaming = false;
             console.log(':: Write File Stream Error:', err);
             console.timeEnd(':: Write File Stream Time');
             console.log('File Size:', UTIL.getFilesizeInMBytes(fd));
