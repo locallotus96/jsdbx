@@ -11,8 +11,6 @@
   -- Match on all fields  
   -- Match on any field  
 
-DAL => UTIL => INDEXER => KDVSET   
-
 ### API:
 => load(callback)  
 => save()  
@@ -32,3 +30,9 @@ DAL => UTIL => INDEXER => KDVSET
 =====> removeAny(query)  
 =====> removeAnyOne(query)  
 ===> count()  
+
+### Architecture:
+
+=> JSDBX:
+  ::=> new UTIL
+  ::<=> new DAL(UTIL) => UTIL => INDEXER => KDVSET

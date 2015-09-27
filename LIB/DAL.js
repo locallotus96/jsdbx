@@ -1,9 +1,9 @@
 'use strict';
 
 var path = require('path');
-var UTIL = new(require('./UTIL.js'));
+//var UTIL = new(require('./UTIL.js'));
 
-module.exports = function(db, collectionName) {
+module.exports = function(db, collectionName, UTIL) {
     var DAL = {}; // data access layer object (class)
 
     // PUBLIC VARIABLES

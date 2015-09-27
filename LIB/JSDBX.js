@@ -83,7 +83,7 @@ var db = {
                 UTIL.resetFileSync(p);
             }
             var _c = collection.replace('.db', '');
-            this[_c] = new require('./DAL.js')(this, _c);
+            this[_c] = new require('./DAL.js')(this, _c, UTIL);
             console.log('Loading Collection:', _c);
             this[_c].load(function(err) {
                 if(err) {
