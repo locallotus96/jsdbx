@@ -12,27 +12,31 @@
   -- Match on any field  
 
 ### API:
-=> load(callback)  
-=> save()  
-==> createIndex(key)  
-==> removeIndex(key)  
-===> insert(data)  
-=====> find(query)  
-=====> findOne(query)  
-=====> findAny(query)  
-=====> findAnyOne(query)  
-=======> update(query, data)  
-=======> updateOne(query, data)  
-=======> updateAny(query, data)  
-=======> updateAnyOne(query, data)  
-=====> remove(query)  
-=====> removeOne(query)  
-=====> removeAny(query)  
-=====> removeAnyOne(query)  
-===> count()  
+
+db.connect(collection, callback)
+db.disconnect(collection, callback)
+
+db.collection => load(callback)  
+db.collection => save(callback)  
+db.collection ===> createIndex(key)  
+db.collection ===> removeIndex(key)  
+db.collection =====> insert(data)  
+db.collection =======> find(query)  
+db.collection =======> findOne(query)  
+db.collection =======> findAny(query)  
+db.collection =======> findAnyOne(query)  
+db.collection =========> update(query, data)  
+db.collection =========> updateOne(query, data)  
+db.collection =========> updateAny(query, data)  
+db.collection =========> updateAnyOne(query, data)  
+db.collection ===========> remove(query)  
+db.collection ===========> removeOne(query)  
+db.collection ===========> removeAny(query)  
+db.collection ===========> removeAnyOne(query)  
+db.collection =============> count()  
 
 ### Architecture:
 
-=> JSDBX:
-  ::=> new UTIL
-  ::<=> new DAL(UTIL) => UTIL => INDEXER => KDVSET
+<=> JSDBX
+  :: => new UTIL
+  :: <=> new DAL(UTIL) => UTIL => INDEXER => new KDVSET

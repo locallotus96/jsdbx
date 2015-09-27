@@ -23,11 +23,12 @@ module.exports = function(db, collectionName, UTIL) {
             console.log('Loading File:', this.FILE);
             UTIL.loadCollection(this.FILE, function(err, data) {
                 if(!err) {
-                    console.log('Loaded Collection - Inserting records from file...');
-                    //DAL.insert(data); // insert file data into the collection
+                    console.log('Loaded Collection!');
                     if(data.length > 0 && typeof(data) === 'object') {
                         DAL.COLLECTION = data;
                     }
+                    //console.log('Loaded Collection - Inserting records from file...');
+                    //DAL.insert(data); // insert file data into the collection
                     DAL.LOADING = false;
                 }
                 callback(err);
