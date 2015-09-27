@@ -16,7 +16,7 @@ var UTIL = new(require('./UTIL.js'));
 var msg = {
     connect_success: '<DB> Successfully connected to : ',
     connect_error_db_path:'<DB> The DB Path "%s" is not valid. Creating path...',
-    loadCollection_initialize:'<DB> Initialize the DB before you with collections. Use: db.connect(path-to-db,"collection")'
+    loadCollection_initialize:'<DB> Initialize the DB before you work with collections. Use: db.connect(path-to-db,"collection")'
 };
 
 var db = {
