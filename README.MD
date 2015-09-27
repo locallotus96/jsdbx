@@ -34,7 +34,7 @@ used by db.disconnect()
 > db.collection => save(callback)  
 
 #### Creating indices
-key is a string of field/property name to index on  
+key is a string of the field/property name to index on  
 > db.collection ===> createIndex(key)  
 > db.collection ===> removeIndex(key)  
 
