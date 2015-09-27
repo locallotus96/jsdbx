@@ -26,7 +26,7 @@ callback takes an err parameter to signal successful connection/disconnection or
 > db.connect(path, collection, callback)  
 > db.disconnect(path, collection, callback)
 
-#### Don't call these methods from db.collection
+#### Don't call these methods from db.collection unless you're ninja :P
 used by db.connect()  
 > db.collection => load(callback)  
 
