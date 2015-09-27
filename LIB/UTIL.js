@@ -53,13 +53,6 @@ UTIL.inserter = function(collection, data) {
                     this.INDEXER.add(p, obj);
                 }
             }
-            /*for(var i = 0; i < this.INDEX_FIELDS.length; i++) {
-                // ok there's a field to index on
-                if(this.INDEX_FIELDS[i] in obj) {
-                    // index this record
-                    UTIL.addIndex(this.INDEX_FIELDS[i], obj);
-                }
-            }*/
             // check for [[obj,obj,],]
             if(obj.length > 0) { // array of objects hopefully
                 collection.concat(this.addIDProperty(obj));
