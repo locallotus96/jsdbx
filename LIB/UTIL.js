@@ -380,10 +380,10 @@ UTIL.matchOne = function (rec, query) {
     return false; // no fields match
 }
 
-// Method to remove all null objects from a list
+// Method to remove all nullified objects from a list
 UTIL.filterDeleted = function (list) {
     for(var i = 0; i < list.length; i++) {
-        if(list[i] === null) {
+        if(list[i]._id === null) {
             list.splice(list[i], 1);
         }
     }

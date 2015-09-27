@@ -1,4 +1,4 @@
 #!/bin/bash
 git add .
-git commit -m 'fixed searching'
+git commit -m 'refactoring'
 git push -u origin master
