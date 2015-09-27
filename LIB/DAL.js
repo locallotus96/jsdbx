@@ -20,24 +20,17 @@ module.exports = function(db, collectionName, UTIL) {
     DAL.load = function (callback) {
         if(!this.LOADING) {
             this.LOADING = true;
-            console.log('Loading File:', this.FILE);
             UTIL.loadCollection(this.FILE, function(err, data) {
                 if(!err) {
-                    console.log('Loaded Collection - Inserting records from file...');
-                    if(data.length > 0 && typeof(data) === 'object') {
-                        DAL.COLLECTION = data;
-                    }
-                    //console.log('Loaded Collection - Inserting records from file...');
-                    //DAL.insert(data); // insert file data into the collection
-                    DAL.LOADING = false;
+                     DAL.COLLECTION = data; // point the collection object to the array of data from file
                 }
+                DAL.LOADING = false;
                 callback(err);
             });
         }
     }
 
     DAL.save = function (callback) {
-        console.log('Saving:', this.count() + ' records');
         UTIL.saveCollection(this.FILE, this.COLLECTION, callback);
     }
 

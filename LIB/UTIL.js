@@ -623,6 +623,7 @@ UTIL.busyAppending = false; // are we currently appending to the file?
 UTIL.busyStreaming = false; // are we currently streaming to the file?
 
 UTIL.saveCollection = function (fd, collection, callback) {
+    console.log('<=> Saving:', collection.length + ' records');
     //this.appendToFileSync(fd, collection);
     if(collection.length === 0) {
         callback();
@@ -669,9 +670,23 @@ UTIL.saveCollection = function (fd, collection, callback) {
 UTIL.loadCollection = function (fd, callback) {
     if(!this.isValidPathSync(fd) || !this.canReadWriteSync(fd)) {
         console.log(':: Error Opening File! Check File Name or Permissions...');
-        callback(true, null);
+        callback(true);
     } else {
-        this.streamFromFile(fd, callback);
+        console.log('<=> Loading File:', fd);
+        console.time('<=> Read File Stream Time');
+        this.streamFromFile(fd, function(err, data) {
+            console.timeEnd('<=> Read File Stream Time');
+            if(!err) {
+                if(data.length > 0 && typeof(data) === 'object') {
+                    console.log('<=> Loaded Collection:', data.length + ' records');
+                    callback(err, data);
+                }
+            } else {
+                console.log(':: Error Loading Collection - Invalid data!');
+                callback(err);
+            }
+        });
+        // Write lines via stream (slower)
         /*var rl = require('readline').createInterface({
             input: fs.createReadStream(fd)
         });
@@ -695,7 +710,7 @@ UTIL.readFromFileSync = function (fd) {
 UTIL.readFromFileAsync = function (fd, callback) {
     fs.readFile(fd, 'utf-8', function(err, data) {
         if(err) {
-            console.error('Error Reading from File!', err);
+            console.error(':: Error Reading from File!', err);
             throw err;
             callback(true);
         } else {
@@ -728,7 +743,7 @@ UTIL.appendLineAsync = function (buffer, error, fd, callback) {
     fs.appendFile(fd, JSON.stringify(data) + '\n', 'utf8', function(err) { // default encodes to utf8
         if(err) {
             error = true;
-            console.error('Error Appending to File!', err);
+            console.error(':: Error Appending to File!', err);
             throw err;
         } else {
             //console.log('Done appending to file!');
@@ -750,12 +765,12 @@ UTIL.streamToFile = function (fd, data, callback) {
     //--- Writable Stream
     var wstream = fs.createWriteStream(fd);
     wstream.on('error', function(err) {
-        console.error('Error writing to file stream!', err);
+        console.error(':: Error writing to file stream!', err);
         callback(true); // signal error to callback
         throw err;
     });
     wstream.on('finish', function() {
-        console.log('Done writing to file stream!');
+        console.log('<=> Done writing to file stream!');
         callback(false); // signal done to callback
     });
     //for(var i = 0; i < data.length; i++) {
@@ -771,12 +786,12 @@ UTIL.streamFromFile = function (fd, callback) {
     rstream.setEncoding('utf8');
     var data = '';
     rstream.on('error', function(err) {
-        console.error('Error reading from file stream!', err);
+        console.error(':: Error reading from file stream!', err);
         callback(true, null);
         throw err;
     });
     rstream.on('end', function() {
-        console.log('Done reading from file stream!');
+        console.log('<=> Done reading from file stream!');
         if(data) {
             callback(false, JSON.parse(data));
         } else {
