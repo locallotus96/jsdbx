@@ -3,7 +3,6 @@
 
 > Supports indexing on any field(s) for fast searches
   - Indices are dynamically maintained
-  - Indices yield roughly O(1) access time on any combination of fields (proportional to indexed vs normal)  
 
 > Supports queries on multiple fields:  
   - Find One  
