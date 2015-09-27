@@ -5,6 +5,7 @@ var UTIL = require('./UTIL.js');
 
 module.exports = function(db, collectionName) {
     var DAL = {}; // data access layer object (class)
+    // PUBLIC VARIABLES
     DAL.C_NAME = collectionName;
     DAL.FILE = path.join(db._db.path, (collectionName + '.db'));
 
@@ -12,16 +13,6 @@ module.exports = function(db, collectionName) {
     DAL.LOADING = false;
     DAL.SAVING = false;
     DAL.COLLECTION = []; // documents / collection of javascript objects
-    DAL.GLOBAL_DIFF = 0; // how many records have been inserted or altered since last collection save
-    DAL.GLOBAL_DIFF_MAX = 1000000;
-    /*
-    DAL.INSERT_DIFF = 0; // how many records have been inserted since last insert write
-    DAL.INSERT_DIFF_MAX = 50;
-    DAL.UPDATE_DIFF = 0;
-    DAL.UPDATE_DIFF_MAX = 50;
-    DAL.DELETE_DIFF = 0;
-    DAL.DELETE_DIFF_MAX = 50;
-    */
 
     //--- DATA ACCESS LAYER API
 
@@ -72,12 +63,6 @@ module.exports = function(db, collectionName) {
             return 0; // invalid data
         }
         var inserted = UTIL.inserter(this.COLLECTION, data);
-        this.GLOBAL_DIFF += inserted;
-        if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
-              UTIL.saveCollection(this.FILE, this.COLLECTION);
-              this.GLOBAL_DIFF = 0;
-        }
-        // TODO: Stream individual records to separate files based on INSERT_DIFF_MIN
         return inserted;
     }
 
@@ -113,55 +98,28 @@ module.exports = function(db, collectionName) {
         if(!query || !data) {
             return 0;
         }
-        var updated = UTIL.updater(this.COLLECTION, query, data, false, true);
-        this.GLOBAL_DIFF += updated;
-        if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
-              UTIL.saveCollection(this.FILE, this.COLLECTION);
-              this.GLOBAL_DIFF = 0;
-        }
-        // TODO: Stream individual records to separate files based on UPDATE_DIFF_MIN
-        return updated;
+        return UTIL.updater(this.COLLECTION, query, data, false, true);
     }
 
     DAL.updateAnyOne = function (query, data) {
         if(!query || !data) {
             return 0;
         }
-        var updated = UTIL.updater(this.COLLECTION, query, data, false, false);
-        this.GLOBAL_DIFF += updated;
-        if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
-              UTIL.saveCollection(this.FILE, this.COLLECTION);
-              this.GLOBAL_DIFF = 0;
-        }
-        // TODO: Stream individual records to separate files based on UPDATE_DIFF_MIN
-        return updated;
+        return UTIL.updater(this.COLLECTION, query, data, false, false);
     }
 
     DAL.update = function (query, data) {
         if(!query || !data) {
             return 0;
         }
-        var updated = UTIL.updater(this.COLLECTION, query, data, true, true);
-        this.GLOBAL_DIFF += updated;
-        if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
-              UTIL.saveCollection(this.FILE, this.COLLECTION);
-              this.GLOBAL_DIFF = 0;
-        }
-        // TODO: Stream individual records to separate files based on UPDATE_DIFF_MIN
-        return updated;
+        return UTIL.updater(this.COLLECTION, query, data, true, true);
     }
 
     DAL.updateAny = function (query, data) {
         if(!query || !data) {
             return 0;
         }
-        var updated = UTIL.updater(this.COLLECTION, query, data, true, false);
-        this.GLOBAL_DIFF += updated;
-        if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
-              UTIL.saveCollection(this.FILE, this.COLLECTION);
-              this.GLOBAL_DIFF = 0;
-        }
-        // TODO: Stream individual records to separate files based on UPDATE_DIFF_MIN
+        return UTIL.updater(this.COLLECTION, query, data, true, false);
         return updated;
     }
 
@@ -169,56 +127,28 @@ module.exports = function(db, collectionName) {
         if(!query) {
             return 0;
         }
-        var deleted = UTIL.remover(this.COLLECTION, query, false, true);
-        this.GLOBAL_DIFF += deleted;
-        if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
-              UTIL.saveCollection(this.FILE, this.COLLECTION);
-              this.GLOBAL_DIFF = 0;
-        }
-        // TODO: Stream individual records to separate files based on DELETE_DIFF_MIN
-        return deleted;
+        return UTIL.remover(this.COLLECTION, query, false, true);
     }
 
     DAL.removeAnyOne = function (query) {
         if(!query) {
             return 0;
         }
-        var deleted = UTIL.remover(this.COLLECTION, query, false, false);
-        this.GLOBAL_DIFF += deleted;
-        if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
-              UTIL.saveCollection(this.FILE, this.COLLECTION);
-              this.GLOBAL_DIFF = 0;
-        }
-        // TODO: Stream individual records to separate files based on DELETE_DIFF_MIN
-        return deleted;
+        return UTIL.remover(this.COLLECTION, query, false, false);
     }
 
     DAL.remove = function (query) {
         if(!query) {
             return 0;
         }
-        var deleted = UTIL.remover(this.COLLECTION, query, true, true);
-        this.GLOBAL_DIFF += deleted;
-        if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
-              UTIL.saveCollection(this.FILE, this.COLLECTION);
-              this.GLOBAL_DIFF = 0;
-        }
-        // TODO: Stream individual records to separate files based on DELETE_DIFF_MIN
-        return deleted;
+        return UTIL.remover(this.COLLECTION, query, true, true);
     }
 
     DAL.removeAny = function (query) {
         if(!query) {
             return 0;
         }
-        var deleted = UTIL.remover(this.COLLECTION, query, true, false);
-        this.GLOBAL_DIFF += deleted;
-        if(this.GLOBAL_DIFF >= this.GLOBAL_DIFF_MAX) {
-              UTIL.saveCollection(tthis.FILE, his.COLLECTION);
-              this.GLOBAL_DIFF = 0;
-        }
-        // TODO: Stream individual records to separate files based on DELETE_DIFF_MIN
-        return deleted;
+        return UTIL.remover(this.COLLECTION, query, true, false);
     }
 
     return DAL;
