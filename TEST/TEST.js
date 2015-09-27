@@ -14,7 +14,7 @@ console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 var cName2 = 'test2';
 db.connect('DB/TEST', cName2, function(err) {
     if(err) {
-        console.log(err);
+        console.log('<DB> Error:', err);
     } else {
         test2();
     }
@@ -44,7 +44,7 @@ function test() {
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   db.disconnect(cName, function(err) {
       if(err) {
-          console.error(err);
+          console.error('<DB> Error:', err);
       } else {
 
       }

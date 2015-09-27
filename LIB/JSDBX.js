@@ -16,7 +16,7 @@ var UTIL = new(require('./UTIL.js'));
 var msg = {
     connect_success: '<DB> Successfully connected to : ',
     connect_error_db_path:'<DB> The DB Path "%s" is not valid. Creating path...',
-    loadCollection_initialize:'<DB> Initialize the DB before you add collections. Use: db.connect(path-to-db,["collection"])'
+    loadCollection_initialize:'<DB> Initialize the DB before you with collections. Use: db.connect(path-to-db,"collection")'
 };
 
 var db = {
@@ -47,24 +47,22 @@ var db = {
         return this;
     },
     disconnect: function(collection, callback) {
-        if (!this._db) {
-            console.log(msg.loadCollections_initialize);
-            callback(false);
-        }
         if(!this[collection]) {
+            console.log(msg.loadCollection_initialize);
             console.log('<DB> Cannot disconnect from unknown collection!');
             callback(false);
         } else {
             console.log('<DB> Saving collection before disconnecting...');
             this[collection].save(function(err) {
                 if(err) {
-                    console.error('<DB> Error saving collection', err);
+                    console.error('<DB> Error saving collection!', err);
                     callback(err);
+                } else {
+                  console.log('<DB> Collection saved! Clearing memory and disconnecting...');
+                  db[collection] = undefined;
+                  db._db = undefined;
+                  callback();
                 }
-                console.log('<DB> Collection saved! Clearing memory and disconnecting...');
-                db[collection] = undefined;
-                db._db = undefined;
-                callback();
             });
 
         }
