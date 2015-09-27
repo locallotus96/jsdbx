@@ -653,7 +653,7 @@ UTIL.loadCollection = function (fd, callback) {
         console.log(':: Error Opening File! Check File Name or Permissions...');
         callback(true);
     } else {
-        console.log('<=> UTIL.loadCollection Streaming... Old File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> UTIL.loadCollection Streaming... File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Loading File:', fd);
         console.time('<=> Read File Stream Time');
         this.streamFromFile(fd, function(err, data) {
@@ -663,11 +663,11 @@ UTIL.loadCollection = function (fd, callback) {
                     console.log('<=> Loaded Collection:', data.length + ' records');
                     callback(null, data);
                 } else {
-                    callback(null, null); // no error but no data either
+                    callback(null, null); // no error but no data either, empty/new file
                 }
             } else {
-                console.log('<=> Read File Stream Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
-                callback(err);
+                console.log('<=> Read File Stream Error:', err + ' File Size:', UTIL.getFilesizeInMBytes(fd));
+                callback(err, null);
             }
         });
         // Write lines via stream (slower)
