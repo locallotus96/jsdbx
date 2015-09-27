@@ -80,6 +80,7 @@ var db = {
                 }
                 var _c = collections[i].replace('.db', '');
                 this[_c] = new require('./DAL.js')(this, _c);
+                console.log('Loading Collection:', _c);
                 this[_c].load(function() {
                     console.log('Finished Loading Collection:', _c + ' ', db[_c].count() + ' records');
                 });

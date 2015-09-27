@@ -1,7 +1,7 @@
 var db = require('../LIB/JSDBX.js');
 
 db.connect('DB/TEST', ['test']);
-
+/*
 console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
 console.log('<DB> Collection: ', db.test.COLLECTION_NAME);
 console.log('<DB> Records:', db.test.count());
@@ -23,4 +23,4 @@ console.timeEnd(':: Insert Time');
 console.log('<DB> Records:', db.test.count());
 
 console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-db.disconnect('test');
+db.disconnect('test');*/
