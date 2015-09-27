@@ -1,10 +1,11 @@
 'use strict';
 
 var path = require('path');
-var UTIL = require('./UTIL.js');
+var UTIL = new(require('./UTIL.js'));
 
 module.exports = function(db, collectionName) {
     var DAL = {}; // data access layer object (class)
+
     // PUBLIC VARIABLES
     DAL.C_NAME = collectionName;
     DAL.FILE = path.join(db._db.path, (collectionName + '.db'));
@@ -23,7 +24,10 @@ module.exports = function(db, collectionName) {
             UTIL.loadCollection(this.FILE, function(err, data) {
                 if(!err) {
                     console.log('Loaded Collection - Inserting records from file...');
-                    DAL.insert(data);
+                    //DAL.insert(data); // insert file data into the collection
+                    if(data.length > 0 && typeof(data) === 'object') {
+                        DAL.COLLECTION = data;
+                    }
                     DAL.LOADING = false;
                 }
                 callback(err);
@@ -32,6 +36,7 @@ module.exports = function(db, collectionName) {
     }
 
     DAL.save = function (callback) {
+        console.log('Saving:', this.count() + ' records');
         UTIL.saveCollection(this.FILE, this.COLLECTION, callback);
     }
 

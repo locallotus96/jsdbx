@@ -12,22 +12,26 @@ var path = require('path');
 var mkdirp = require('mkdirp');
 
 //local modules
-var UTIL = require('./UTIL.js');
+var UTIL = new(require('./UTIL.js'));
 var msg = {
     connect_success: 'Successfully connected to : ',
     connect_error_db_path:'The DB Path "%s" is not valid. Creating path...',
-    loadCollections_initialize:'Initialize the DB before you add collections. Use: db.connect(path-to-db,["collection"])'
+    loadCollection_initialize:'Initialize the DB before you add collections. Use: db.connect(path-to-db,["collection"])'
 };
 
 var db = {
-    connect: function(path, collections, callback) {
+    connect: function(path, collection, callback) {
+        if(this[collection]) {
+            console.error('Already connected to:', collection);
+            return;
+        }
         if (UTIL.isValidPath(path)) {
             var _db = {};
             _db.path = path;
             this._db = _db;
             console.log(msg.connect_success + path);
-            if (collections) {
-                this.loadCollections(collections, callback);
+            if (collection) {
+                this.loadCollections(collection, callback);
             }
         } else {
             console.log(msg.connect_error_db_path, path);
@@ -36,8 +40,8 @@ var db = {
             _db.path = path;
             this._db = _db;
             console.log(msg.connect_success + path);
-            if (collections) {
-                this.loadCollections(collections, callback);
+            if (collection) {
+                this.loadCollections(collection, callback);
             }
         }
         return this;
@@ -55,44 +59,42 @@ var db = {
             this[collection].save(function(err) {
                 if(err) {
                     console.error('Error saving collection', err);
-                    callback(false);
+                    callback(err);
                     throw err;
                 }
                 console.log('Collection saved! Clearing memory and disconnecting...');
                 db[collection] = undefined;
                 db._db = undefined;
-                callback(true);
+                callback();
             });
 
         }
         return true;
     },
-    loadCollections: function(collections, callback) {
+    loadCollections: function(collection, callback) {
         if (!this._db) {
-            console.log(msg.loadCollections_initialize);
+            console.log(msg.loadCollection_initialize);
             return false;
         }
-        if (typeof collections === 'object' && collections.length) {
-            for (var i = 0; i < collections.length; i++) {
-                var p = path.join(this._db.path, (collections[i].indexOf('.db') >= 0 ? collections[i] : collections[i] + '.db'));
-                if (!UTIL.isValidPath(p)) {
-                    console.log('Collection does not exist! Creating...');
-                    UTIL.resetFileSync(p);
-                }
-                var _c = collections[i].replace('.db', '');
-                this[_c] = new require('./DAL.js')(this, _c);
-                console.log('Loading Collection:', _c);
-                this[_c].load(function(err) {
-                    if(err) {
-                        console.error('Error Loading Collection!');
-                    } else {
-                        console.log('Finished Loading and Inserting Collection:', _c + ' ', db[_c].count() + ' records');
-                    }
-                    callback(err);
-                });
+        if (typeof collection === 'string' && collection.length > 0) {
+            var p = path.join(this._db.path, (collection.indexOf('.db') >= 0 ? collection : collection + '.db'));
+            if (!UTIL.isValidPath(p)) {
+                console.log('Collection does not exist! Creating...');
+                UTIL.resetFileSync(p);
             }
+            var _c = collection.replace('.db', '');
+            this[_c] = new require('./DAL.js')(this, _c);
+            console.log('Loading Collection:', _c);
+            this[_c].load(function(err) {
+                if(err) {
+                    console.error('Error Loading Collection!');
+                } else {
+                    console.log('Finished Loading and Inserting Collection:', _c + ' ', db[_c].count() + ' records');
+                }
+                callback(err);
+            });
         } else {
-            console.log('Invalid Collections Array.', 'Expected Format : ', '[\'collection1\',\'collection2\',\'collection3\']');
+            console.log('Invalid Collection Name String!');
         }
         return this;
     }

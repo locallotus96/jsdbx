@@ -618,16 +618,22 @@ UTIL.deduplicate = function (collection) {
 //--- FILE OPERATIONS ===================================================
 //--- ===================================================================
 
+// TODO For some reason these switches are static between instances, so don't use them
 UTIL.busyAppending = false; // are we currently appending to the file?
 UTIL.busyStreaming = false; // are we currently streaming to the file?
+
 UTIL.saveCollection = function (fd, collection, callback) {
-    //this.resetFileSync(fd);
     //this.appendToFileSync(fd, collection);
+    if(collection.length === 0) {
+        callback();
+        return;
+    }
 
     if(!this.busyAppendingg && !this.busyStreaming) {
         this.filterDeleted(collection);
     } else {
         callback()
+        return;
     }
 
     // ~8 seconds for 100 000 records
@@ -647,14 +653,14 @@ UTIL.saveCollection = function (fd, collection, callback) {
     // ~3 seconds for 100 000 records
     // streaming overwrites the file each new stream
     if(!this.busyStreaming) {
-        this.busyStreaming = true;
+        this.busyStreaming = false;
         console.log('<=> UTIL.saveCollection Streaming... File Size:', this.getFilesizeInMBytes(fd));
-        console.time(':: Write File Stream Time');
+        console.time('<=> Write File Stream Time');
         UTIL.streamToFile(fd, collection, function(err) {
             UTIL.busyStreaming = false;
-            console.log(':: Write File Stream Error:', err);
-            console.timeEnd(':: Write File Stream Time');
-            console.log('File Size:', UTIL.getFilesizeInMBytes(fd));
+            console.log('<=> Write File Stream Error:', err);
+            console.timeEnd('<=> Write File Stream Time');
+            console.log('<=> File Size:', UTIL.getFilesizeInMBytes(fd));
             callback(err);
         });
     }
@@ -774,7 +780,8 @@ UTIL.streamFromFile = function (fd, callback) {
         if(data) {
             callback(false, JSON.parse(data));
         } else {
-            callback(false, false); // must return some object or [] because of data length check in UTIL.inserter
+            // should not return some empty object {} or [] because of UTIL.inserter performing data length check / detecting a valid object
+            callback(false, false);
         }
     });
     rstream.on('data', function(chunk) {
@@ -876,4 +883,8 @@ UTIL.getFilesizeInMBytes = function (fd) {
     }
 }
 
-module.exports = UTIL;
+// Allows using new UTIL()
+module.exports = function() {
+    return UTIL;
+}
+//module.exports = UTIL;
