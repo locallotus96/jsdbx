@@ -18,9 +18,14 @@ db = require('./LIB/JSDBX.js')
 db.connect(collection, callback)  
 db.disconnect(collection, callback)
 
-db.collection => load(callback) // used by db.connect()
-db.collection => save(callback) // used by db.disconnect()
-db.collection ===> createIndex(key) // key is a string of field/property name to index on
+// used by db.connect()
+db.collection => load(callback)
+
+// used by db.disconnect()
+db.collection => save(callback)   
+
+// key is a string of field/property name to index on
+db.collection ===> createIndex(key)
 db.collection ===> removeIndex(key)  
 db.collection =====> insert(data)  
 db.collection =======> find(query)  
