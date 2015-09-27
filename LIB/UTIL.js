@@ -367,7 +367,7 @@ UTIL.matchAll = function (rec, query) {
         /*if(!(p in rec) || !(rec[p] === query[p]))) {
             return false; // a field didn't match
         }*/
-        // much faster
+        // faster ~ 25%
         if(!(rec[p] === query[p])) {
             return false; // a field didn't match
         }
@@ -380,7 +380,7 @@ UTIL.matchOne = function (rec, query) {
         /*if(p in rec && rec[p] === query[p]) {
             return true; // a field matches
         }*/
-        // much faster
+        // faster ~ 25%
         if(rec[p] === query[p]) {
             return true; // a field matches
         }
