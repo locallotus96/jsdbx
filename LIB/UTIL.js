@@ -364,7 +364,11 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
 */
 UTIL.matchAll = function (rec, query) {
     for(var p in query) {
-        if(!(p in rec) || !(rec[p] == query[p])) {
+        /*if(!(p in rec) || !(rec[p] === query[p]))) {
+            return false; // a field didn't match
+        }*/
+        // much faster
+        if(!(rec[p] === query[p])) {
             return false; // a field didn't match
         }
     }
@@ -373,7 +377,11 @@ UTIL.matchAll = function (rec, query) {
 // Like matchAll but for a single field (~ inverse)
 UTIL.matchOne = function (rec, query) {
     for(var p in query) {
-        if(p in rec && rec[p] == query[p]) {
+        /*if(p in rec && rec[p] === query[p]) {
+            return true; // a field matches
+        }*/
+        // much faster
+        if(rec[p] === query[p]) {
             return true; // a field matches
         }
     }
