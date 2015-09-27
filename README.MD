@@ -13,7 +13,7 @@
 
 ### API:
 
-db.connect(collection, callback)
+db.connect(collection, callback)  
 db.disconnect(collection, callback)
 
 db.collection => load(callback)  
