@@ -8,7 +8,7 @@ console.log('<DB> Records:', db.test.count());
 
 console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
 console.time(':: Insert Time');
-for (var i = 0; i < 100000; i++) {
+for (var i = 0; i < 250000; i++) {
     db.test.insert({
         name: 'Buffer' + i,
         surname: 'Underrun' + i,
