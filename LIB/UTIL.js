@@ -159,14 +159,12 @@ UTIL.finder = function(collection, query, multi, matchAll) {
                 //}
                 retDocs.push(rec);
                 if(!multi) {
-                    console.log('UTIL.finder Iteration', i+1 + ' Found One at index', i + ' \n', collection[i]);
-                    return this.getUniqueElements(retDocs);
+                    break;
                 }
             }
         }
     }
-    console.log('UTIL.finder Found', retDocs.length + ' documents in', i + ' iterations');
-    console.log(retDocs);
+    console.log('UTIL.finder Found', this.getUniqueElements(retDocs).length + ' documents in', i + ' iterations');
     return this.getUniqueElements(retDocs);
 }
 
@@ -261,8 +259,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                 }
                 removed++;
                 if(!multi) {
-                    console.log('UTIL.remover Iteration', i+1 + ' Removed One at index', i);
-                    return removed;
+                    break;
                 }
             }
         }
@@ -347,8 +344,7 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
                 collection[i] = merge(rec, data);
                 updated++;
                 if(!multi) {
-                    console.log('UTIL.updater Iteration', i+1 + ' Updated One at index', i + ' \n', collection[i]);
-                    return updated;
+                    break;
                 }
             }
         }

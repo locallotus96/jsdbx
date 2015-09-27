@@ -39,7 +39,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
-  db[cName].findAny({ name: 'Buffer50000', score: 99650 });
+  db[cName].findAny({ name: 'Buffer50000', score: 99650, teacher: 'None', age: 50 });
   console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
@@ -61,6 +61,16 @@ function test() {
   console.time(':: Find Any Time');
   db[cName].findAny({ name: 'Buffer50000', score: 99650 });
   console.timeEnd(':: Find Any Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find One Time');
+  db[cName].findOne({ name: 'Buffer50000', score: 50000, teacher: 'Tim', city: 'Cape Town' });
+  console.timeEnd(':: Find One Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find Time');
+  db[cName].find({ name: 'Buffer50000', score: 50000, teacher: 'Tim', city: 'Cape Town' });
+  console.timeEnd(':: Find Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   db.disconnect(cName, function(err) {
