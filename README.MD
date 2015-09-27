@@ -3,13 +3,17 @@
 
 > Supports indexing on any field(s) for fast searches
   - Indices are dynamically maintained
-  - Indices yield roughly O(1) access time on any combination of fields (indexed vs normal)  
+  - Indices yield roughly O(1) access time on any combination of fields (proportional to indexed vs normal)  
 
 > Supports queries on multiple fields:  
   - Find One  
   - Find Many  
   -- Match on all fields  
   -- Match on any field  
+
+I hit max records at just over 175000 records given my test insertion.
+This safely saved 253MB of a json stringified array of objects.
+JSON.stringify and JSON.parse can't deal with more data on my machine.
 
 ### API:
 

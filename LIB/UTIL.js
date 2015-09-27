@@ -618,32 +618,30 @@ UTIL.deduplicate = function (collection) {
 //--- FILE OPERATIONS ===================================================
 //--- ===================================================================
 
-UTIL.busyAppending = false; // are we currently appending to the file?
-UTIL.busyStreaming = false; // are we currently streaming to the file?
+UTIL.busyWriteStreaming = false; // are we currently streaming to the file?
 
 UTIL.saveCollection = function (fd, collection, callback) {
     console.log('<=> Saving:', collection.length + ' records');
-    //this.appendToFileSync(fd, collection);
     if(collection.length === 0) {
         callback();
         return;
     }
 
     // streaming overwrites the file each new stream
-    if(!this.busyStreaming) {
+    if(!this.busyWriteStreaming) {
         this.filterDeleted(collection);
-        this.busyStreaming = true;
+        this.busyWriteStreaming = true;
         console.log('<=> UTIL.saveCollection Streaming... Old File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Saving File:', fd);
         console.time('<=> Write File Stream Time');
         UTIL.streamToFile(fd, collection, function(err) {
-            UTIL.busyStreaming = false;
+            UTIL.busyWriteStreaming = false;
             console.log('<=> Write File Stream Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
             console.timeEnd('<=> Write File Stream Time');
             callback(err);
         });
     } else {
-        callback('Busy streaming!'); // signal error (we're just busy)
+        callback('Busy write streaming!'); // signal error (we're just busy)
         return;
     }
 }

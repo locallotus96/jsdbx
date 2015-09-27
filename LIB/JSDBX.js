@@ -21,8 +21,9 @@ var msg = {
 
 var db = {
     connect: function(path, collection, callback) {
+        console.error('<DB> Connecting to:', path + '/' + collection);
         if(this[collection]) {
-            console.error('<DB> Already connected to:', collection);
+            console.error('<DB> Already connected to:', path + '/' + collection);
             return;
         }
         if (UTIL.isValidPath(path)) {
@@ -39,8 +40,8 @@ var db = {
             var _db = {};
             _db.path = path;
             this._db = _db;
-            console.log(msg.connect_success + path);
             if (collection) {
+                console.log(msg.connect_success + path);
                 this.loadCollections(collection, callback);
             }
         }

@@ -11,7 +11,7 @@ db.connect('DB/TEST', cName, function(err) {
 });
 
 console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-var cName2 = 'test2';
+var cName2 = 'test';
 db.connect('DB/TEST', cName2, function(err) {
     if(err) {
         console.log('<DB> Error:', err);
@@ -27,7 +27,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Insert Time');
-  for (var i = 0; i < 100000; i++) {
+  for (var i = 0; i < 1750000; i++) {
       db[cName].insert({
           name: 'Buffer' + i,
           surname: 'Underrun' + i,
