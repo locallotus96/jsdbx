@@ -24,7 +24,7 @@ db.collection => load(callback)
 // used by db.disconnect()  
 db.collection => save(callback)  
 
-// key is a string of field/property name to index on
+// key is a string of field/property name to index on  
 db.collection ===> createIndex(key)
 db.collection ===> removeIndex(key)  
 db.collection =====> insert(data)  
