@@ -27,13 +27,16 @@ used by db.disconnect()
 key is a string of field/property name to index on  
 > db.collection ===> createIndex(key)  
 > db.collection ===> removeIndex(key)  
+
 data can be a single object or an array of objects
 > db.collection =====> insert(data)  
+
 query is an object with keys/values to search for  
 > db.collection =======> find(query)  
 > db.collection =======> findOne(query)  
 > db.collection =======> findAny(query)  
 > db.collection =======> findAnyOne(query)  
+
 data is an object of keys/values to merge with a matching object  
 > db.collection =========> update(query, data)  
 > db.collection =========> updateOne(query, data)  
