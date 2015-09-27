@@ -28,7 +28,7 @@ module.exports = function(db, collectionName) {
     DAL.load = function (callback) {
         if(!this.LOADING) {
             this.LOADING = true;
-            console.log('Loading file:', this.FILE);
+            console.log('Loading File:', this.FILE);
             UTIL.loadCollection(this.FILE, function(err, data) {
                 if(!err) {
                     console.log('Loaded Collection - Inserting records from file...');
