@@ -617,7 +617,7 @@ UTIL.saveCollection = function (fd, collection, callback) {
     if(!this.busyWriteStreaming) {
         this.filterDeleted(collection);
         this.busyWriteStreaming = true;
-        console.log('<=> UTIL.saveCollection Streaming... Old File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> UTIL.saveCollection Streaming. Old File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Saving File:', fd);
         console.time('<=> Write File Stream Time');
         UTIL.streamToFile(fd, collection, function(err) {
