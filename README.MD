@@ -13,37 +13,37 @@
 
 ### API:
 
-db = require('./LIB/JSDBX.js')
+> db = require('./LIB/JSDBX.js')
 
-db.connect(collection, callback)  
-db.disconnect(collection, callback)
+> db.connect(collection, callback)  
+> db.disconnect(collection, callback)
 
 // used by db.connect()  
-db.collection => load(callback)  
+> db.collection => load(callback)  
 
 // used by db.disconnect()  
-db.collection => save(callback)  
+> db.collection => save(callback)  
 
 // key is a string of field/property name to index on  
-db.collection ===> createIndex(key)  
-db.collection ===> removeIndex(key)  
-db.collection =====> insert(data)  
-db.collection =======> find(query)  
-db.collection =======> findOne(query)  
-db.collection =======> findAny(query)  
-db.collection =======> findAnyOne(query)  
-db.collection =========> update(query, data)  
-db.collection =========> updateOne(query, data)  
-db.collection =========> updateAny(query, data)  
-db.collection =========> updateAnyOne(query, data)  
-db.collection ===========> remove(query)  
-db.collection ===========> removeOne(query)  
-db.collection ===========> removeAny(query)  
-db.collection ===========> removeAnyOne(query)  
-db.collection =============> count()  
+> db.collection ===> createIndex(key)  
+> db.collection ===> removeIndex(key)  
+> db.collection =====> insert(data)  
+> db.collection =======> find(query)  
+> db.collection =======> findOne(query)  
+> db.collection =======> findAny(query)  
+> db.collection =======> findAnyOne(query)  
+> db.collection =========> update(query, data)  
+> db.collection =========> updateOne(query, data)  
+> db.collection =========> updateAny(query, data)  
+> db.collection =========> updateAnyOne(query, data)  
+> db.collection ===========> remove(query)  
+> db.collection ===========> removeOne(query)  
+> db.collection ===========> removeAny(query)  
+> db.collection ===========> removeAnyOne(query)  
+> db.collection =============> count()  
 
 ### Architecture:
 
-<=> JSDBX  
-    :: => new UTIL  
-    :: <=> new DAL(UTIL) => UTIL => INDEXER => new KDVSET  
+> <=> JSDBX  
+>     :: => new UTIL  
+>     :: <=> new DAL(UTIL) => UTIL => INDEXER => new KDVSET  
