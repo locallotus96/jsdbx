@@ -20,14 +20,14 @@ var msg = {
 };
 
 var db = {
-    connect: function(path, collections) {
+    connect: function(path, collections, callback) {
         if (UTIL.isValidPath(path)) {
             var _db = {};
             _db.path = path;
             this._db = _db;
             console.log(msg.connect_success + path);
             if (collections) {
-                this.loadCollections(collections);
+                this.loadCollections(collections, callback);
             }
         } else {
             console.log(msg.connect_error_db_path, path);
@@ -37,36 +37,37 @@ var db = {
             this._db = _db;
             console.log(msg.connect_success + path);
             if (collections) {
-                this.loadCollections(collections);
+                this.loadCollections(collections, callback);
             }
-            //return false;
         }
         return this;
     },
-    disconnect: function(collection) {
+    disconnect: function(collection, callback) {
         if (!this._db) {
             console.log(msg.loadCollections_initialize);
-            return false;
+            callback(false);
         }
         if(!this[collection]) {
             console.log('Cannot disconnect from unknown collection!');
-            return false;
+            callback(false);
         } else {
             console.log('Saving collection before disconnecting...');
             this[collection].save(function(err) {
                 if(err) {
                     console.error('Error saving collection', err);
+                    callback(false);
                     throw err;
                 }
                 console.log('Collection saved! Clearing memory and disconnecting...');
                 db[collection] = undefined;
                 db._db = undefined;
+                callback(true);
             });
 
         }
         return true;
     },
-    loadCollections: function(collections) {
+    loadCollections: function(collections, callback) {
         if (!this._db) {
             console.log(msg.loadCollections_initialize);
             return false;
@@ -81,8 +82,13 @@ var db = {
                 var _c = collections[i].replace('.db', '');
                 this[_c] = new require('./DAL.js')(this, _c);
                 console.log('Loading Collection:', _c);
-                this[_c].load(function() {
-                    console.log('Finished Loading Collection:', _c + ' ', db[_c].count() + ' records');
+                this[_c].load(function(err) {
+                    if(err) {
+                        console.error('Error Loading Collection!');
+                    } else {
+                        console.log('Finished Loading and Inserting Collection:', _c + ' ', db[_c].count() + ' records');
+                    }
+                    callback(err);
                 });
             }
         } else {
@@ -90,7 +96,6 @@ var db = {
         }
         return this;
     }
-
 };
 
 module.exports = db;

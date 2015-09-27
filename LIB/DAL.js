@@ -5,11 +5,12 @@ var UTIL = require('./UTIL.js');
 
 module.exports = function(db, collectionName) {
     var DAL = {}; // data access layer object (class)
-    DAL.COLLECTION_NAME = collectionName;
+    DAL.C_NAME = collectionName;
     DAL.FILE = path.join(db._db.path, (collectionName + '.db'));
 
     /* PRIVATE VARIABLES (should not be exported except for testing) */
     DAL.LOADING = false;
+    DAL.SAVING = false;
     DAL.COLLECTION = []; // documents / collection of javascript objects
     DAL.GLOBAL_DIFF = 0; // how many records have been inserted or altered since last collection save
     DAL.GLOBAL_DIFF_MAX = 1000000;
@@ -27,13 +28,14 @@ module.exports = function(db, collectionName) {
     DAL.load = function (callback) {
         if(!this.LOADING) {
             this.LOADING = true;
-            UTIL.loadCollection(this.FILE, function(done, line) {
-                if(done) {
+            console.log('Loading file:', this.FILE);
+            UTIL.loadCollection(this.FILE, function(err, data) {
+                if(!err) {
+                    console.log('Loaded Collection - Inserting records from file...');
+                    DAL.insert(data);
                     DAL.LOADING = false;
-                    callback();
-                } else {
-                    DAL.insert(line);
                 }
+                callback(err);
             });
         }
     }
