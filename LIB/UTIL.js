@@ -679,10 +679,11 @@ UTIL.loadCollection = function (fd, callback) {
             if(!err) {
                 if(data.length > 0 && typeof(data) === 'object') {
                     console.log('<=> Loaded Collection:', data.length + ' records');
-                    callback(err, data);
+                    callback(null, data);
+                } else {
+                    callback(false); // no error but no data either
                 }
             } else {
-                console.log(':: Error Loading Collection - Invalid data!');
                 callback(err);
             }
         });
@@ -712,9 +713,9 @@ UTIL.readFromFileAsync = function (fd, callback) {
         if(err) {
             console.error(':: Error Reading from File!', err);
             throw err;
-            callback(true);
+            callback(err);
         } else {
-            callback(false, data);
+            callback(null, data);
         }
     });
 }
@@ -726,9 +727,7 @@ UTIL.appendToFileAsync = function (fd, data, callback) {
     } else {
         buffer.push(data);
     }
-
-    var error = false;
-    this.appendLineAsync(buffer, error, fd, callback);
+    this.appendLineAsync(buffer, null, fd, callback);
 }
 
 // helper function for appendToFileAsync()
@@ -736,18 +735,16 @@ UTIL.appendToFileAsync = function (fd, data, callback) {
 UTIL.appendLineAsync = function (buffer, error, fd, callback) {
     // finished when buffer is empty
     if(buffer.length === 0) {
-        callback(error);
+        callback(err);
         return;
     }
     var data = buffer.shift();
     fs.appendFile(fd, JSON.stringify(data) + '\n', 'utf8', function(err) { // default encodes to utf8
         if(err) {
-            error = true;
             console.error(':: Error Appending to File!', err);
             throw err;
         } else {
-            //console.log('Done appending to file!');
-            UTIL.appendLineAsync(buffer, error, fd, callback);
+            UTIL.appendLineAsync(buffer, err, fd, callback);
         }
     });
 }
@@ -766,12 +763,12 @@ UTIL.streamToFile = function (fd, data, callback) {
     var wstream = fs.createWriteStream(fd);
     wstream.on('error', function(err) {
         console.error(':: Error writing to file stream!', err);
-        callback(true); // signal error to callback
+        callback(null); // signal error to callback
         throw err;
     });
     wstream.on('finish', function() {
         console.log('<=> Done writing to file stream!');
-        callback(false); // signal done to callback
+        callback(null); // signal done to callback
     });
     //for(var i = 0; i < data.length; i++) {
         //wstream.write(JSON.stringify(data[i]) + '\n');
@@ -787,16 +784,16 @@ UTIL.streamFromFile = function (fd, callback) {
     var data = '';
     rstream.on('error', function(err) {
         console.error(':: Error reading from file stream!', err);
-        callback(true, null);
+        callback(err, null);
         throw err;
     });
     rstream.on('end', function() {
         console.log('<=> Done reading from file stream!');
         if(data) {
-            callback(false, JSON.parse(data));
+            callback(null, JSON.parse(data));
         } else {
             // should not return some empty object {} or [] because of UTIL.inserter performing data length check / detecting a valid object
-            callback(false, false);
+            callback(null, {});
         }
     });
     rstream.on('data', function(chunk) {

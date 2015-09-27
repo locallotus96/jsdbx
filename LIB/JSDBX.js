@@ -87,7 +87,7 @@ var db = {
             console.log('<DB> Loading Collection:', _c);
             this[_c].load(function(err) {
                 if(err) {
-                    console.error('<DB> Error Loading Collection!');
+                    console.error('<DB> Error Loading Collection!', err);
                 } else {
                     console.log('<DB> Finished Loading and Inserting Collection:', _c + ' ', db[_c].count() + ' records');
                 }

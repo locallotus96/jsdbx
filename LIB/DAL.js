@@ -21,17 +21,27 @@ module.exports = function(db, collectionName, UTIL) {
         if(!this.LOADING) {
             this.LOADING = true;
             UTIL.loadCollection(this.FILE, function(err, data) {
-                if(!err) {
+                if(!err && data) { // no error and data was returned
                      DAL.COLLECTION = data; // point the collection object to the array of data from file
                 }
                 DAL.LOADING = false;
                 callback(err);
             });
+        } else {
+            callback(false);
         }
     }
 
     DAL.save = function (callback) {
-        UTIL.saveCollection(this.FILE, this.COLLECTION, callback);
+        if(!this.SAVING) {
+            this.SAVING = true;
+            UTIL.saveCollection(this.FILE, this.COLLECTION, function(err) {
+                DAL.SAVING = false;
+                callback(err);
+            });
+        } else {
+            callback(false);
+        }
     }
 
     DAL.createIndex = function (field) {
@@ -61,8 +71,7 @@ module.exports = function(db, collectionName, UTIL) {
         if(typeof data !== 'object') {
             return 0; // invalid data
         }
-        var inserted = UTIL.inserter(this.COLLECTION, data);
-        return inserted;
+        return UTIL.inserter(this.COLLECTION, data);
     }
 
     DAL.findOne = function (query) {
