@@ -46,7 +46,7 @@ UTIL.inserter = function(collection, data) {
         for(var i = 0; i < data.length; i++) {
             obj = data[i];
             // check if new object contains a field to index on
-            for(p in this.INDEXER.INDECES) {
+            for(var p in this.INDEXER.INDECES) {
                 // ok there's a field to index on
                 if(p in obj) {
                     // index this record
@@ -101,7 +101,7 @@ UTIL.finder = function(collection, query, multi, matchAll) {
 
     // INDEX SEARCH
     // check if we have an index for this search query
-    for(p in query) {
+    for(var p in query) {
         if(p in this.INDEXER.INDECES) { // this field is indexed
             indexed = true;
             console.log('=> Query is indexed via', p);
@@ -194,7 +194,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
 
     // INDEX SEARCH
     // check if we have an index for this search query
-    for(p in query) {
+    for(var p in query) {
         if(p in this.INDEXER.INDECES) { // this field is indexed
             indexed = true;
             console.log('=> Query is indexed via', p);
@@ -208,7 +208,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                         match = this.matchOne(indexedRecs[i], query);
                     if(match) {
                         // check if we should update any index for this record
-                        for(p in rec) {
+                        for(var p in rec) {
                             if(p in this.INDEXER.INDECES) { // this field changed
                                 console.log('UTIL.remover Updating indexed key', p);
                                 //console.log(rec[p]);
@@ -222,7 +222,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                         //console.log(collection.splice(i, 1));
 
                         // We set each property to null, affecting the underlying memory, now we can't find it!
-                        for(p in rec) {
+                        for(var p in rec) {
                             rec[p] = null;
                         }
                         removed++;
@@ -273,7 +273,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                 //console.log(collection.splice(i, 1));
 
                 // We set each property to null, affecting the underlying memory, now we can't find it!
-                for(p in rec) {
+                for(var p in rec) {
                     rec[p] = null;
                 }
                 removed++;
@@ -302,7 +302,7 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
 
     // INDEX SEARCH
     // check if we have an index for this search query
-    for(p in query) {
+    for(var p in query) {
         if(p in this.INDEXER.INDECES) { // this field is indexed
             indexed = true;
             console.log('=> Query is indexed via', p);
@@ -318,7 +318,7 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
                         rec = merge(rec, data);
                         updated++;
                         // check if we should update any index for this record
-                        for(p in rec) {
+                        for(var p in rec) {
                             if(p in this.INDEXER.INDECES) { // this field changed
                                 console.log('UTIL.updater Updating indexed key', p);
                                 //console.log(rec[p]);
@@ -385,7 +385,7 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
     all fields and values in the query.
 */
 UTIL.matchAll = function (rec, query) {
-    for(p in query) {
+    for(var p in query) {
         if(!(p in rec) || !(rec[p] == query[p])) {
             return false; // a field didn't match
         }
