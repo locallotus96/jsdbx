@@ -1,5 +1,5 @@
 # JavaScript DBX
-## A json object database in nodejs.
+## A json object database in node.js
 
 > Supports indexing on any field(s) for fast searches
   - Indices are dynamically maintained
