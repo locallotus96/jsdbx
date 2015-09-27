@@ -37,8 +37,8 @@ db.collection ===========> removeAny(query)
 db.collection ===========> removeAnyOne(query)  
 db.collection =============> count()  
 
-### Architecture:   
+### Architecture:
 
-<=> JSDBX
-  :: => new UTIL
-  :: <=> new DAL(UTIL) => UTIL => INDEXER => new KDVSET
+<=> JSDBX  
+  :: => new UTIL  
+  :: <=> new DAL(UTIL) => UTIL => INDEXER => new KDVSET  
