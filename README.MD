@@ -12,14 +12,14 @@
   -- Match on any field  
 
 I hit max records at just over 1750000 (1.75 mil) records given my test insertion.
-This safely saved 253MB of a json stringified array of objects.
+This safely saved 253MB of data from a json stringified array of objects.
 JSON.stringify and JSON.parse can't deal with more data on my machine.
 
 ### API:
 
 > db = require('./LIB/JSDBX.js')
 
-path is path to the collection(s) and collection is the name of the specific collection  
+path is path to the collection(s) and collection is the name of the specific collection to connect
 callback takes an err parameter to signal successful connection/disconnection or failure thereof  
 > db.connect(path, collection, callback)  
 > db.disconnect(path, collection, callback)
