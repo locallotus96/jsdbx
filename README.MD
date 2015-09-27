@@ -41,4 +41,4 @@ db.collection =============> count()
 
 <=> JSDBX
   :: => new UTIL
-  :: <=> new DAL(UTIL) => UTIL => INDEXER => new KDVSET
+  :: <=> new DAL(UTIL) => UTIL => INDEXER => new KDVSET   
