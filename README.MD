@@ -19,8 +19,10 @@ JSON.stringify and JSON.parse can't deal with more data on my machine.
 
 > db = require('./LIB/JSDBX.js')
 
-> db.connect(collection, callback)  
-> db.disconnect(collection, callback)
+path is path to the collection(s) and collection is the name of the specific collection  
+callback takes an err parameter to signal successful connection/disconnection or failure thereof  
+> db.connect(path, collection, callback)  
+> db.disconnect(path, collection, callback)
 
 used by db.connect()  
 > db.collection => load(callback)  
