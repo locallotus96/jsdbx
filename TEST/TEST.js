@@ -44,7 +44,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
-  db[cName].findAny({ name: 'Buffer50000', score: 99650, teacher: 'None', age: 50 });
+  db[cName].findAny({ name: 'Buffer50000', score: 99650, teacher: 'None', age: 50, surname: 'Underrun66000', city: 'None' });
   console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
@@ -86,6 +86,11 @@ function test() {
   console.time(':: Remove Time');
   db[cName].remove({ age: 50 });
   console.timeEnd(':: Remove Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find Any Time');
+  db[cName].findAny({ age: 50 });
+  console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   db.disconnect(cName, function(err) {
