@@ -618,7 +618,7 @@ UTIL.saveFileStream = function (fd, collection, callback) {
     if(!this.busyWriteStreaming) {
         this.filterDeleted(collection);
         this.busyWriteStreaming = true;
-        console.log('<=> UTIL.saveCollection Streaming. Old File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> Streaming. Old File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Saving File:', fd);
         console.time('<=> Write File Stream Time');
         UTIL.streamToFile(fd, collection, function(err) {
@@ -628,7 +628,7 @@ UTIL.saveFileStream = function (fd, collection, callback) {
             callback(err);
         });
     } else {
-        callback('Busy write streaming!'); // signal error (we're just busy)
+        callback(':: Busy write streaming!'); // signal error (we're just busy)
         return;
     }
 }
@@ -644,7 +644,7 @@ UTIL.saveFileStreamLines = function (fd, collection, callback) {
     if(!this.busyWriteStreaming) {
         this.filterDeleted(collection);
         this.busyWriteStreaming = true;
-        console.log('<=> UTIL.saveCollection Streaming lines. Old File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> Streaming lines. Old File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Saving File:', fd);
         console.time('<=> Write File Stream Lines Time');
         UTIL.streamLinesToFile(fd, collection, function(err) {
@@ -654,7 +654,7 @@ UTIL.saveFileStreamLines = function (fd, collection, callback) {
             callback(err);
         });
     } else {
-        callback('Busy write streaming!'); // signal error (we're just busy)
+        callback(':: Busy write streaming!'); // signal error (we're just busy)
         return;
     }
 }
@@ -803,7 +803,7 @@ UTIL.streamLinesFromFile = function (fd, callback) {
     });
 
     rl.on('close', function () {
-        console.log(':: Done streaming lines - closing file');
+        console.log('<=> Done streaming lines - closing file');
         callback(null, data);
     });
 }
