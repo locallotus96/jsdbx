@@ -748,6 +748,7 @@ UTIL.streamLinesToFile = function (fd, data, callback) {
             /*if(!ok) {
                 // stops kernel memory buffer from flowing into userspace
                 // which can cause a write or memory error
+                // this happens because the writer can't keep up with the data coming in
                 //console.log('Draining');
                 wstream.once('Drain', write); // listener is not calling write again
                 break;
