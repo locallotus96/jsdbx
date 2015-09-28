@@ -109,14 +109,14 @@ UTIL.finder = function(collection, query, multi, matchAll) {
                     if(match) {
                         // TODO: Remove duplicates at the end with getUniqueElements()
                         // check if we've already found this object (multi reference issue)
-                        //if(retDocs.indexOf(indexedRecs[i]) >= 0) {
+                        if(retDocs.indexOf(rec) >= 0) {
                         //    console.log('UTIL.finder Already found!');
-                        //    continue; // next loop cycle
-                        //}
+                            continue; // next loop cycle
+                        }
                         retDocs.push(indexedRecs[i]);
                         if(!multi) {
                             console.log('UTIL.finder Found One via index:', p);
-                            return this.getUniqueElements(retDocs);
+                            return retDocs; //this.getUniqueElements(retDocs);
                         }
                     }
                 }
@@ -166,8 +166,8 @@ UTIL.finder = function(collection, query, multi, matchAll) {
             }
         }
     }
-    console.log('UTIL.finder Found', this.getUniqueElements(retDocs).length + ' documents in', i + ' iterations');
-    return this.getUniqueElements(retDocs);
+    console.log('UTIL.finder Found', retDocs.length + ' documents in', i + ' iterations');
+    return retDocs; //this.getUniqueElements(retDocs);
 }
 
 UTIL.remover = function(collection, query, multi, matchAll) {
@@ -385,6 +385,10 @@ UTIL.matchOne = function (rec, query) {
     return false; // no fields match
 }
 
+UTIL.getObjectSize = function (obj) {
+    return Object.keys(obj).length;
+}
+
 // Method to remove all nullified objects from a list
 UTIL.filterDeleted = function (list) {
     for(var i = 0; i < list.length; i++) {
@@ -405,8 +409,48 @@ UTIL.listContains = function (list, obj) {
     return false;
 }
 
-UTIL.getObjectSize = function (obj) {
-    return Object.keys(obj).length;
+/*
+  Is there some method of array like set in python?
+  The standard way to do this is usually insert elements into a hash,
+  then collect the keys - since keys are guaranteed to be unique.
+  Or, similarly, but preserving order:
+*/
+// Slightly more consistent algorithm performance-wise
+UTIL.getUniqueElements = function (collection) {
+    var seen = {}; // set containing unique elements
+    var result = [];
+    var elem, elemStr;
+    for (var i = 0; i < collection.length; i++) {
+        elem = collection[i];
+        // stringify the object it so it can be a valid unique property in the set
+        elemStr = JSON.stringify(elem);
+        if (!seen[elemStr]) {
+            seen[elemStr] = true;
+            result[result.length] = elem;
+        }
+    }
+    return result;
+}
+
+// Removes duplicate elements from a collection / array
+// Use the notion of a set, which every JavaScript object is an example of.
+// Slightly faster on arrays with more unique elements compared to getUniqueElements()
+// When not many unique elements are present, this is slower
+// Slows down again when nearly all elements are unique, catch 22...
+UTIL.deduplicate = function (collection) {
+    var set = {};
+    for(var i = 0; i < collection.length; i++) {
+        // adds or replaces an entry in the set
+        // stringify objects so they can be used as valid unique properties in the set
+        // redundant for strings and numbers but still needed due to parse
+        set[JSON.stringify(collection[i])] = true;
+    }
+    // Put all properties of the set back into the array
+    collection = [];
+    for(var elem in set) { // awlays gets the element as a string, so we need to parse it
+        collection[collection.length] = JSON.parse(elem);
+    }
+    return collection;
 }
 
 /*
@@ -549,50 +593,6 @@ UTIL.selectionSort = function (collection, field) {
         if(i != min) {
             this.swap(collection, i, min);
         }
-    }
-    return collection;
-}
-
-/*
-  Is there some method of array like set in python?
-  The standard way to do this is usually insert elements into a hash,
-  then collect the keys - since keys are guaranteed to be unique.
-  Or, similarly, but preserving order:
-*/
-// Slightly more consistent algorithm performance-wise
-UTIL.getUniqueElements = function (collection) {
-    var seen = {}; // set containing unique elements
-    var result = [];
-    var elem, elemStr;
-    for (var i = 0; i < collection.length; i++) {
-        elem = collection[i];
-        // stringify the object it so it can be a valid unique property in the set
-        elemStr = JSON.stringify(elem);
-        if (!seen[elemStr]) {
-            seen[elemStr] = true;
-            result[result.length] = elem;
-        }
-    }
-    return result;
-}
-
-// Removes duplicate elements from a collection / array
-// Use the notion of a set, which every JavaScript object is an example of.
-// Slightly faster on arrays with more unique elements compared to getUniqueElements()
-// When not many unique elements are present, this is slower
-// Slows down again when nearly all elements are unique, catch 22...
-UTIL.deduplicate = function (collection) {
-    var set = {};
-    for(var i = 0; i < collection.length; i++) {
-        // adds or replaces an entry in the set
-        // stringify objects so they can be used as valid unique properties in the set
-        // redundant for strings and numbers but still needed due to parse
-        set[JSON.stringify(collection[i])] = true;
-    }
-    // Put all properties of the set back into the array
-    collection = [];
-    for(var elem in set) { // awlays gets the element as a string, so we need to parse it
-        collection[collection.length] = JSON.parse(elem);
     }
     return collection;
 }
