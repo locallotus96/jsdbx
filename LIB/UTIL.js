@@ -116,7 +116,7 @@ UTIL.finder = function(collection, query, multi, matchAll) {
                         retDocs.push(rec);
                         if(!multi) {
                             console.log('UTIL.finder Found One via index:', p);
-                            return retDocs; //this.getUniqueElements(retDocs); // slower
+                            break; //return this.getUniqueElements(retDocs); // slower
                         }
                     }
                 }
@@ -210,7 +210,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                         }
                         removed++;
                         if(!multi) {
-                            return removed;
+                            break;
                         }
                     }
                 }
@@ -293,16 +293,15 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
                     if(match) {
                         // check if we should update any index for this record
                         for(var p in rec) {
-                            if(p in INDEXER.INDECES) { // this field changed
+                            if(p in INDEXER.INDECES) { // this field is indexed and changing
                                 //console.log('UTIL.updater Updating indexed key', p);
-                                //console.log(p, rec[p], data[p], rec, false);
                                 INDEXER.update(p, rec[p], data[p], rec, false);
                             }
                         }
                         rec = merge(rec, data);
                         updated++;
                         if(!multi) {
-                            return updated;
+                            break;
                         }
                     }
                 }
