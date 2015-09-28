@@ -664,7 +664,7 @@ UTIL.loadFileStream = function (fd, callback) {
         console.log(':: Error Opening File! Check File Name or Permissions...');
         callback(true);
     } else {
-        console.log('<=> UTIL.loadCollection Streaming... File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> Streaming... File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Loading File:', fd);
         console.time('<=> Read File Stream Time');
         this.streamFromFile(fd, function(err, data) {
