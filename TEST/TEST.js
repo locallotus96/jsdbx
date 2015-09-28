@@ -83,6 +83,11 @@ function test() {
   console.timeEnd(':: Find Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find Any Time');
+  db[cName].findAny({ age: 50 });
+  console.timeEnd(':: Find Any Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Remove Time');
   db[cName].remove({ age: 50 });
   console.timeEnd(':: Remove Time');

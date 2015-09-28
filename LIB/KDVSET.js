@@ -46,11 +46,11 @@ module.exports = function () {
     // TODO: Put update for removal in own function
     // Proceed with caution...
     this.update = function (oldKey, newKey, val, remove) {
-        if(this.SET[oldKey]) { // check that the old key exists
-            if(this.SET[newKey]) { // the new key exists
+        if(this.contains(val[oldKey])) { // check that the old key exists
+            if(this.contains(val[newKey])) { // the new key exists
                 // Now we need to check if the key contains a pointer to the object
                 // get the array of values from the key
-                var p = this.SET[newKey];
+                var p = this.get(val[newKey]);
                 // check if object reference is in the array
                 for(var i = 0; i < p.length; i++) {
                     // check if reference equals reference at index
@@ -62,7 +62,7 @@ module.exports = function () {
                             // if this index contains no more values, remove it
                             if(p.length === 0) {
                                 //console.log(':: KDVSET.update Removing empty key:', oldKey);
-                                this.remove(oldKey);
+                                this.remove(val[oldKey]);
                             }
                             return true;
                         }
@@ -74,7 +74,7 @@ module.exports = function () {
             } else { // the new key does not exist
                 // Now we need to remove the matching object reference for the new key from the old key
                 // get the array of values from the old key
-                var p = this.SET[oldKey];
+                var p = this.get(val[oldKey]);
                 // check if object reference is in the array
                 for(var i = 0; i < p.length; i++) {
                     // check if reference equals reference at index
@@ -83,26 +83,26 @@ module.exports = function () {
                         p.splice(i, 1);
                         // if this key contains no more values, remove it
                         if(p.length === 0) {
-                            console.log(':: KDVSET.update Removing empty key:', p);
-                            this.remove(oldKey);
+                            console.log(':: KDVSET.update Removing empty key:', val[oldKey], p);
+                            this.remove(val[oldKey]);
                         }
                         break;
                     }
                 }
                 if(!remove) {
                     // insert the new key and value => object reference
-                    this.add(newKey, val);
+                    this.add(val[newKey], val);
                 }
             }
             return true;
         } else { // oldKey isn't even here, insert newKey
             if(!remove) { // we're not here to delete this missing key
                 // insert the new key and value => object reference
-                this.add(newKey, val);
+                this.add(val[newKey], val);
                 return true;
             }
-            console.log('Old key not found!');
-            return true;
+            //console.log(':: KDVSET.update Old key not found!');
+            return false;
         }
     }
 

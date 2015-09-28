@@ -196,18 +196,11 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                     if(match) {
                         // check if we should update any index for this record
                         for(var p in rec) {
-                            if(p in INDEXER.INDECES) { // this field changed
+                            if(p in INDEXER.INDECES) { // this field is indexed
                                 //console.log('UTIL.remover Updating indexed key', p);
-                                //console.log(rec[p]);
-                                INDEXER.update(p, rec[p], rec[p], rec, true);
+                                INDEXER.update(p, p, '', query, true);
                             }
                         }
-                        //---
-                        //console.log('UTIL.remover Splicing array index:', i);
-                        // splice also mutates the array that calls it.
-                        // and we throw away the new array because we're removing all those records
-                        //console.log(collection.splice(i, 1));
-
                         // We set each property to null, affecting the underlying memory, now we can't find it!
                         for(var p in rec) {
                             rec[p] = null;
@@ -249,10 +242,10 @@ UTIL.remover = function(collection, query, multi, matchAll) {
             else
                 match = this.matchOne(rec, query);
             if(match) {
-                //console.log('UTIL.remover Splicing array index:', i);
+                // console.log('UTIL.remover Splicing array index:', i);
                 // splice also mutates the array that calls it.
                 // and we throw away the new array because we're removing all those records
-                //console.log(collection.splice(i, 1));
+                // console.log(collection.splice(i, 1));
 
                 // We set each property to null, affecting the underlying memory, now we can't find it!
                 for(var p in rec) {
