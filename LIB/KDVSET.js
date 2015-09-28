@@ -43,7 +43,6 @@ module.exports = function () {
         return this.SET[key];
     }
 
-    // TODO: Put update for removal in own function
     // Proceed with caution...
     this.update = function (oldKey, newKey, val, remove) {
         if(this.contains(oldKey)) { // check that the old key exists
