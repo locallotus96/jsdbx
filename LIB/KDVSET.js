@@ -69,12 +69,11 @@ module.exports = function () {
                                 //console.log(':: KDVSET.update Removing empty key:', oldKey);
                                 this.remove(oldKey);
                             }
-                            return true;
                         } else {
-                            console.log('Updating key', oldKey);
-                            //p[i][oldKey] = oldKey;
+                            this.remove(oldKey);
+                            this.add(newKey, val);
                         }
-                        return false; // bail out
+                        return true;
                     }
                 }
                 // append value/object to array

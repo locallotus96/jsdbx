@@ -295,7 +295,7 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
                         // check if we should update any index for this record
                         for(var p in rec) {
                             if(p in INDEXER.INDECES) { // this field changed
-                                console.log('UTIL.updater Updating indexed key', p);
+                                //console.log('UTIL.updater Updating indexed key', p);
                                 //console.log(p, rec[p], data[p], rec, false);
                                 INDEXER.update(p, rec[p], data[p], rec, false);
                             }
