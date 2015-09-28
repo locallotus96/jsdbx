@@ -597,6 +597,16 @@ UTIL.selectionSort = function (collection, field) {
 UTIL.busyWriteStreaming = false; // are we currently streaming to the file?
 
 UTIL.saveCollection = function (fd, collection, callback) {
+    //this.saveFileStream(fd, collection, callback); // faster but we have to json stringify/parse the array and hit a size limit
+    this.saveFileStreamLines(fd, collection, callback);
+}
+
+UTIL.loadCollection = function (fd, callback) {
+    //this.loadFileStream(fd, callback); // faster but we have to json stringify/parse the array and hit a size limit
+    this.loadFileStreamLines(fd, callback);
+}
+
+UTIL.saveFileStream = function (fd, collection, callback) {
     console.log('<=> Saving:', collection.length + ' records');
     if(collection.length === 0) {
         callback();
@@ -622,7 +632,33 @@ UTIL.saveCollection = function (fd, collection, callback) {
     }
 }
 
-UTIL.loadCollection = function (fd, callback) {
+UTIL.saveFileStreamLines = function (fd, collection, callback) {
+    console.log('<=> Saving:', collection.length + ' records');
+    if(collection.length === 0) {
+        callback();
+        return;
+    }
+
+    // streaming overwrites the file each new stream
+    if(!this.busyWriteStreaming) {
+        this.filterDeleted(collection);
+        this.busyWriteStreaming = true;
+        console.log('<=> UTIL.saveCollection Streaming lines. Old File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> Saving File:', fd);
+        console.time('<=> Write File Stream Lines Time');
+        UTIL.streamLinesToFile(fd, collection, function(err) {
+            UTIL.busyWriteStreaming = false;
+            console.log('<=> Write File Stream Lines Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
+            console.timeEnd('<=> Write File Stream Lines Time');
+            callback(err);
+        });
+    } else {
+        callback('Busy write streaming!'); // signal error (we're just busy)
+        return;
+    }
+}
+
+UTIL.loadFileStream = function (fd, callback) {
     if(!this.isValidPathSync(fd) || !this.canReadWriteSync(fd)) {
         console.log(':: Error Opening File! Check File Name or Permissions...');
         callback(true);
@@ -644,21 +680,116 @@ UTIL.loadCollection = function (fd, callback) {
                 callback(err, null);
             }
         });
-        // Write lines via stream (slower)
-        /*var rl = require('readline').createInterface({
-            input: fs.createReadStream(fd)
-        });
-
-        rl.on('line', function (line) {
-            //console.log('Line from file:', line);
-            callback(false, JSON.parse(line));
-        });
-
-        rl.on('close', function () {
-            console.log(':: Done Reading Lines - Closing File');
-            callback(true);
-        });*/
     }
+}
+
+UTIL.loadFileStreamLines = function (fd, callback) {
+    if(!this.isValidPathSync(fd) || !this.canReadWriteSync(fd)) {
+        console.log(':: Error Opening File! Check File Name or Permissions...');
+        callback(true);
+    } else {
+        console.log('<=> UTIL.loadCollection Streaming lines... File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> Loading File:', fd);
+        console.time('<=> Read File Stream Lines Time');
+        this.streamLinesFromFile(fd, function(err, data) {
+            console.timeEnd('<=> Read File Stream Lines Time');
+            if(!err) {
+                if(data.length > 0 && typeof(data) === 'object') {
+                    console.log('<=> Loaded Collection:', data.length + ' records');
+                    callback(null, data);
+                } else {
+                    callback(null, null); // no error but no data either, empty/new file
+                }
+            } else {
+                console.log('<=> Read File Stream Lines Error:', err + ' File Size:', UTIL.getFilesizeInMBytes(fd));
+                callback(err, null);
+            }
+        });
+    }
+}
+
+UTIL.streamToFile = function (fd, data, callback) {
+    if(!data.length) { // assuming a single object
+        data = [data];
+    }
+    //--- Writable Stream
+    var wstream = fs.createWriteStream(fd);
+    wstream.on('error', function(err) {
+        console.error(':: Error writing to file stream!', err);
+        callback(err); // signal error to callback
+    });
+    wstream.on('finish', function() {
+        console.log('<=> Done writing to file stream!');
+        callback(false); // signal done to callback with no error
+    });
+    wstream.write(JSON.stringify(data));
+    wstream.end(); // emits 'finish' event
+}
+
+UTIL.streamLinesToFile = function (fd, data, callback) {
+    if(!data.length) { // assuming a single object
+        data = [data];
+    }
+    //--- Writable Stream
+    var wstream = fs.createWriteStream(fd);
+    wstream.on('error', function(err) {
+        console.error(':: Error writing line to file stream!', err);
+        callback(err); // signal error to callback
+    });
+    wstream.on('finish', function() {
+        console.log('<=> Done writing lines to file stream!');
+        callback(false); // signal done to callback with no error
+    });
+    for(var i = 0; i < data.length; i++) {
+        wstream.write(JSON.stringify(data[i]) + '\n');
+    }
+    wstream.end(); // emits 'finish' event
+}
+
+// Reads whole file into data object,
+// that's why we hit a json length limit since everything is one giant json string object
+// javascript can't serialize like other languages...
+UTIL.streamFromFile = function (fd, callback) {
+    //--- Readable Stream
+    var rstream = fs.createReadStream(fd);
+    rstream.setEncoding('utf8');
+    var data = '';
+    rstream.on('error', function(err) {
+        console.error(':: Error reading from file stream!', err);
+        callback(err, null);
+    });
+    rstream.on('end', function() {
+        console.log('<=> Done reading from file stream!');
+        if(data) {
+            callback(null, JSON.parse(data));
+        } else {
+            callback(null, {});
+        }
+    });
+    rstream.on('data', function(chunk) {
+        data += chunk;
+    });
+}
+
+// Read and parse lines from the file,
+// individual lines aka objects should be json stringified upon insertion
+UTIL.streamLinesFromFile = function (fd, callback) {
+    // Read lines via stream (slower)
+    var data = [];
+    var rl = require('readline').createInterface({
+        input: fs.createReadStream(fd)
+    });
+
+    rl.on('line', function (line) {
+        //console.log('Line from file:\n', line);
+        //callback(null, JSON.parse(line));
+        data[data.length] = JSON.parse(line);
+    });
+
+    rl.on('close', function () {
+        console.log(':: Done Streaming Lines - Closing File');
+        callback(null, data);
+    });
 }
 
 UTIL.readFromFileSync = function (fd) {
@@ -710,49 +841,6 @@ UTIL.appendToFileSync = function (fd, data) {
     for(var i = 0; i < data.length; i++) {
         fs.appendFileSync(fd, JSON.stringify(data[i]) + '\n', {encoding: 'utf8', flag: 'a'});
     }
-}
-
-UTIL.streamToFile = function (fd, data, callback) {
-    if(!data.length) { // assuming a single object
-        data = [data];
-    }
-    //--- Writable Stream
-    var wstream = fs.createWriteStream(fd);
-    wstream.on('error', function(err) {
-        console.error(':: Error writing to file stream!', err);
-        callback(err); // signal error to callback
-    });
-    wstream.on('finish', function() {
-        console.log('<=> Done writing to file stream!');
-        callback(false); // signal done to callback with no error
-    });
-    //for(var i = 0; i < data.length; i++) {
-        //wstream.write(JSON.stringify(data[i]) + '\n');
-    //}
-    wstream.write(JSON.stringify(data));
-    wstream.end(); // emits 'finish' event
-}
-
-UTIL.streamFromFile = function (fd, callback) {
-    //--- Readable Stream
-    var rstream = fs.createReadStream(fd);
-    rstream.setEncoding('utf8');
-    var data = '';
-    rstream.on('error', function(err) {
-        console.error(':: Error reading from file stream!', err);
-        callback(err, null);
-    });
-    rstream.on('end', function() {
-        console.log('<=> Done reading from file stream!');
-        if(data) {
-            callback(null, JSON.parse(data));
-        } else {
-            callback(null, {});
-        }
-    });
-    rstream.on('data', function(chunk) {
-        data += chunk;
-    });
 }
 
 UTIL.removeFileSync = function (fd) {

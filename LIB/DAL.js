@@ -25,9 +25,9 @@ module.exports = function(db, collectionName, UTIL) {
                      DAL.COLLECTION = data; // point the collection object to the array of data from file
                 }
                 DAL.LOADING = false;
-                callback(err);
+                callback(err); // don't pass the data from the API to the user (hehe)
             });
-        } else {
+        } else { // We're busy loading
             callback(false);
         }
     }
@@ -39,7 +39,7 @@ module.exports = function(db, collectionName, UTIL) {
                 DAL.SAVING = false;
                 callback(err);
             });
-        } else {
+        } else { // We're busy saving
             callback(false);
         }
     }

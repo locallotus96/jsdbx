@@ -1,4 +1,4 @@
 #!/bin/bash
 git add .
-git commit -m 'fixed index issue when updating'
+git commit -m 'updated file handling'
 git push -u origin master
