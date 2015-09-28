@@ -12,20 +12,20 @@ db.connect('DB/TEST', cName, function(err) {
 
 console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
 var cName2 = 'test';
-db.connect('DB/TEST', cName2, function(err) {
+/*db.connect('DB/TEST', cName2, function(err) {
     if(err) {
         console.log('<DB> Error:', err);
     } else {
         test2();
     }
-});
+});*/
 
 //--------------------------------------------------------------
 function test() {
   console.log('<DB> Current Collection: ', db[cName].C_NAME);
   console.log('<DB> Current Records:', db[cName].count());
 
-  insertTestRecords(100000, cName);
+  insertTestRecords(1000000, cName);
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find One Time');

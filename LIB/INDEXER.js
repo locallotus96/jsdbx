@@ -21,7 +21,6 @@ INDEXER.get = function (field, key) {
     return this.INDECES[field].get(key);
 }
 
-// TODO: Put update for removal in own function
 INDEXER.update = function (field, oldKey, newKey, obj, remove) {
     return this.INDECES[field].update(oldKey, newKey, obj, remove);
 }

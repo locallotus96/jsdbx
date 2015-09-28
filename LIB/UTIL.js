@@ -598,6 +598,7 @@ UTIL.selectionSort = function (collection, field) {
 UTIL.busyWriteStreaming = false; // are we currently streaming to the file?
 
 UTIL.saveCollection = function (fd, collection, callback) {
+    console.log('<=> Saving:', collection.length + ' records (not yet filtered for null)');
     //this.saveFileStream(fd, collection, callback); // faster but we have to json stringify/parse the array and hit a size limit
     this.saveFileStreamLines(fd, collection, callback);
 }
@@ -608,20 +609,20 @@ UTIL.loadCollection = function (fd, callback) {
 }
 
 UTIL.saveFileStream = function (fd, collection, callback) {
-    console.log('<=> Saving:', collection.length + ' records');
     if(collection.length === 0) {
         callback();
         return;
     }
-
     // streaming overwrites the file each new stream
     if(!this.busyWriteStreaming) {
+        console.time('<=> Filter Null Records Time');
         this.filterDeleted(collection);
+        console.timeEnd('<=> Filter Null Records Time');
         this.busyWriteStreaming = true;
         console.log('<=> Streaming. Old File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Saving File:', fd);
         console.time('<=> Write File Stream Time');
-        UTIL.streamToFile(fd, collection, function(err) {
+        this.streamToFile(fd, collection, function(err) {
             UTIL.busyWriteStreaming = false;
             console.log('<=> Write File Stream Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
             console.timeEnd('<=> Write File Stream Time');
@@ -634,20 +635,21 @@ UTIL.saveFileStream = function (fd, collection, callback) {
 }
 
 UTIL.saveFileStreamLines = function (fd, collection, callback) {
-    console.log('<=> Saving:', collection.length + ' records');
     if(collection.length === 0) {
         callback();
         return;
     }
-
     // streaming overwrites the file each new stream
     if(!this.busyWriteStreaming) {
+        console.time('<=> Filter Null Records Time');
         this.filterDeleted(collection);
+        console.timeEnd('<=> Filter Null Records Time');
         this.busyWriteStreaming = true;
         console.log('<=> Streaming lines. Old File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Saving File:', fd);
         console.time('<=> Write File Stream Lines Time');
-        UTIL.streamLinesToFile(fd, collection, function(err) {
+        this.streamLinesToFile(fd, collection, function(err) { // very slow, ~30sec for 1mil rec
+        //this.bufferWriteFileSync(fd, collection, function(err) { // ~2sec for 1mil rec
             UTIL.busyWriteStreaming = false;
             console.log('<=> Write File Stream Lines Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
             console.timeEnd('<=> Write File Stream Lines Time');
@@ -689,10 +691,11 @@ UTIL.loadFileStreamLines = function (fd, callback) {
         console.log(':: Error Opening File! Check File Name or Permissions...');
         callback(true);
     } else {
-        console.log('<=> UTIL.loadCollection Streaming lines... File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> Streaming lines... File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Loading File:', fd);
         console.time('<=> Read File Stream Lines Time');
         this.streamLinesFromFile(fd, function(err, data) {
+        //this.bufferReadFileSync(fd, function(err, data) { // no real difference to streamLines
             console.timeEnd('<=> Read File Stream Lines Time');
             if(!err) {
                 if(data.length > 0 && typeof(data) === 'object') {
@@ -707,6 +710,50 @@ UTIL.loadFileStreamLines = function (fd, callback) {
             }
         });
     }
+}
+
+UTIL.bufferWriteFileSync = function (fd, data, callback) {
+    if(!data.length && typeof(data) === 'object') { // assuming a single object
+        data = [data];
+    }
+    var o = fs.openSync(fd, 'w');
+    var sout = '', bout;
+    var lCount = 0;
+    var lMax = 1024 < data.length ? 1024 : data.length;
+    console.log('<=> Max lines to buffer', lMax);
+    for(var i = 0; i < data.length; i++) {
+        sout += JSON.stringify(data[i]) + '\n';
+        lCount++;
+        if(lCount === lMax || i === data.length-1) {
+            bout = new Buffer(sout, 'utf8');
+            //console.log('<<<< Writing buffer of length', bout.length + ' bytes');
+            fs.writeSync(o, bout, 0, bout.length);
+            sout = '';
+            lCount = 0;
+        }
+    }
+    fs.closeSync(o);
+    console.log('<=> Done buffer writing to file!');
+    callback(false);
+}
+
+UTIL.bufferReadFileSync = function (fd, callback) {
+    var i = fs.openSync(fd, 'r');
+    var bin = new Buffer(1024 * 1024);
+    var l, len, prev = '';
+    var data = [];
+    while(len = fs.readSync(i, bin, 0, bin.length)) {
+        l = (prev + bin.toString('utf8', 0, len)).split('\n');
+        prev = len === bin.length ? '\n' + l.splice(l.length-1)[0] : '';
+        l.forEach(function(line) {
+            if(!line)
+                return;
+            data[data.length] = JSON.parse(line);
+        });
+    }
+    fs.closeSync(i);
+    console.log('<=> Done buffer reading from file!');
+    callback(null, data);
 }
 
 UTIL.streamToFile = function (fd, data, callback) {
@@ -803,7 +850,7 @@ UTIL.streamLinesFromFile = function (fd, callback) {
     });
 
     rl.on('close', function () {
-        console.log('<=> Done streaming lines - closing file');
+        console.log('<=> Done streaming lines from file!');
         callback(null, data);
     });
 }
@@ -836,7 +883,6 @@ UTIL.readFromFileAsync = function (fd, callback) {
     fs.readFile(fd, 'utf-8', function(err, data) {
         if(err) {
             console.error(':: Error Reading from File!', err);
-            throw err;
             callback(err);
         } else {
             callback(null, data);
