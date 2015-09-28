@@ -16,7 +16,7 @@
   API:
     SET.add(key,val)
     SET.get(key)
-    SET.update(oldKey,newKey,val)
+    SET.update(oldKey,newKey,val,remove)
     SET.remove(key)
     SET.rename(oldKey,newKey)
     SET.contains(key)
