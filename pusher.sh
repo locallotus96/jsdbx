@@ -1,4 +1,4 @@
 #!/bin/bash
 git add .
-git commit -m 'updated file handling'
+git commit -m 'refactor'
 git push -u origin master
