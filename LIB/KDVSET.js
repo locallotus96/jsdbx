@@ -47,59 +47,32 @@ module.exports = function () {
     // Proceed with caution...
     this.update = function (oldKey, newKey, val, remove) {
         if(this.contains(oldKey)) { // check that the old key exists
-            if(this.contains(newKey)) { // the new key exists
-                // Now we need to check if the key contains a pointer to the object
-                // get the array of values from the key
-                var p = this.get(oldKey);
-                // check if object reference is in the array
-                // loop backwards so we don't loop in the same direction as we're splicing
-                // Otherwise we miss half the references as splice() modifies the array in place
-                for(var i = p.length-1; i >= 0; i--) {
-                    // check if reference equals reference at index
-                    if(p[i] === val) {
-                        // remove reference with splice
-                        p.splice(i, 1);
-                        // if this index contains no more values, remove it
-                        if(p.length === 0) {
-                            //console.log(':: KDVSET.update Removing empty key:', oldKey, p);
-                            this.remove(oldKey);
-                        }
-                        if(!remove) { // we aim to update
-                            //console.log(':: KDVSET.update Adding new key:', newKey, val);
-                            // insert the new key and value => object reference
-                            this.add(newKey, val);
-                        }
-                        return true;
+            // Now we need to check if the key contains a pointer to the object
+            // get the array of values from the key
+            var p = this.get(oldKey);
+            // check if object reference is in the array
+            // loop backwards so we don't loop in the same direction as we're splicing
+            // Otherwise we miss half the references as splice() modifies the array in place
+            for(var i = p.length-1; i >= 0; i--) {
+                // check if reference equals reference at index
+                if(p[i] === val) {
+                    // ok there exists a key with the same object reference
+                    // remove reference with splice
+                    p.splice(i, 1);
+                    // if this index contains no more values, remove it
+                    if(p.length === 0) {
+                        //console.log(':: KDVSET.update Removing empty key:', oldKey, p);
+                        this.remove(oldKey);
                     }
-                }
-            } else { // the new key does not exist
-                // Now we need to remove the matching object reference for the new key from the old key
-                // get the array of values from the old key
-                var p = this.get(oldKey);
-                // check if object reference is in the array
-                // loop backwards so we don't loop in the same direction as we're splicing
-                // Otherwise we miss half the references as splice() modifies the array in place
-                for(var i = p.length-1; i >= 0; i--) {
-                    // check if reference equals reference at index
-                    if(p[i] === val) {
-                        // ok there exists a key with the same object reference
-                        // remove reference with splice
-                        p.splice(i, 1);
-                        // if this key contains no more values, remove it
-                        if(p.length === 0) {
-                            //console.log(':: KDVSET.update Removing empty key!:', oldKey, p);
-                            this.remove(oldKey);
-                        }
-                        if(!remove) { // we aim to update
-                            //console.log(':: KDVSET.update Adding new key!', newKey, val);
-                            // insert the new key and value => object reference
-                            this.add(newKey, val);
-                        }
-                        return true;
+                    if(!remove) { // we aim to update
+                        //console.log(':: KDVSET.update Adding new key:', newKey, val);
+                        // insert the new key and value => object reference
+                        this.add(newKey, val);
                     }
+                    return true;
                 }
             }
-        } else { // oldKey isn't even here, insert newKey if updating
+        } else { // oldKey isn't even here, just insert newKey if updating
             if(!remove) { // we're not here to delete this missing key
                 // insert the new key and value => object reference
                 this.add(newKey, val);
