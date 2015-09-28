@@ -285,7 +285,6 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
             if(indexedRecs) {
                 // loop backwards due to INDEXER.update splicing stored values pointing to the record
                 for(var j = indexedRecs.length-1; j >= 0; j--) {
-                //for(var i = 0; i < indexedRecs.length; i++) {
                     rec = indexedRecs[j];
                     if(matchAll)
                         match = this.matchAll(rec, query);
