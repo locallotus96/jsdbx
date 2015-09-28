@@ -54,10 +54,11 @@ module.exports = function () {
                 // check if object reference is in the array
                 // loop backwards so we don't loop in the same direction as we're splicing
                 // Otherwise we miss half the references as splice() modifies the array in place
-                for(var i = p.length; i > 0; i--) {
+                var i = p.length;
+                console.log(i);
+                while(i--) {
                     // check if reference equals reference at index
-                    if(val === p[i]) {
-                        // ok there exists a key with the same object reference
+                    if(p[i] === val) {
                         if(remove) { // we aim to remove this key
                             // remove reference with splice
                             p.splice(i, 1);
@@ -80,20 +81,11 @@ module.exports = function () {
                 // check if object reference is in the array
                 // loop backwards so we don't loop in the same direction as we're splicing
                 // Otherwise we miss half the references as splice() modifies the array in place
-                /*for(var i = p.length; i > 0; i--) {
-                    // check if reference at index equals reference to object
-                    if(p[i] === val) {
-                        console.log('Removing value from index', oldKey, p.length, i);
-                        // remove reference with splice
-                        p.splice(i, 1);
-                        break; // break because we do this for each found document
-                    }
-                }*/
                 var i = p.length;
-                console.log(i);
                 while(i--) {
+                    // check if reference equals reference at index
                     if(p[i] === val) {
-                        console.log('Removing value from index', oldKey, p.length, i);
+                        // ok there exists a key with the same object reference
                         // remove reference with splice
                         p.splice(i, 1);
                         break; // break because we do this for each found document (val) and there should only be one match possible

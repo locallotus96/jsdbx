@@ -187,8 +187,10 @@ UTIL.remover = function(collection, query, multi, matchAll) {
             console.log('=> Query is indexed via', p);
             indexedRecs = INDEXER.get(p, query[p]);
             if(indexedRecs) {
-                for(var i = indexedRecs.length; i > 0; i--) {
-                    rec = indexedRecs[i];
+                // loop backwards due to INDEXER.update splicing stored values pointing to the record
+                var j = indexedRecs.length;
+                while(j--) {
+                    rec = indexedRecs[j];
                     if(!rec) continue;
 
                     if(matchAll)

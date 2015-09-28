@@ -93,9 +93,9 @@ function test() {
   console.timeEnd(':: Remove Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-  console.time(':: Find Any Time');
-  console.log(db[cName].findAny({ age: 50 }));
-  console.timeEnd(':: Find Any Time');
+  console.time(':: Find Time');
+  db[cName].find({ age: 50 });
+  console.timeEnd(':: Find Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   db.disconnect(cName, function(err) {
@@ -135,7 +135,7 @@ function insertTestRecords(x, cName) {
           score: i,
           teacher: 'Tim',
           city: 'Cape Town',
-          age: Math.floor((Math.random() * 8000) + 1)
+          age: Math.floor((Math.random() * 100) + 1)
       });
   };
   console.timeEnd(':: Insert Time');
