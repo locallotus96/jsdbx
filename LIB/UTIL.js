@@ -198,7 +198,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                         for(var p in rec) {
                             if(p in INDEXER.INDECES) { // this field is indexed
                                 //console.log('UTIL.remover Updating indexed key', p);
-                                INDEXER.update(p, p, '', query, true);
+                                INDEXER.update(p, p, '', rec, true);
                             }
                         }
                         // We set each property to null, affecting the underlying memory, now we can't find it!

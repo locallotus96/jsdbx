@@ -83,7 +83,7 @@ module.exports = function () {
                         p.splice(i, 1);
                         // if this key contains no more values, remove it
                         if(p.length === 0) {
-                            console.log(':: KDVSET.update Removing empty key:', val[oldKey], p);
+                            //console.log(':: KDVSET.update Removing empty key:', val[oldKey], p);
                             this.remove(val[oldKey]);
                         }
                         break;
