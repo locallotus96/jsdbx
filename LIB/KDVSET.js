@@ -52,7 +52,9 @@ module.exports = function () {
                 // get the array of values from the key
                 var p = this.get(val[newKey]);
                 // check if object reference is in the array
-                for(var i = 0; i < p.length; i++) {
+                // loop backwards so we don't loop in the same direction as we're splicing
+                // Otherwise we miss half the references as splice() modifies the array in place
+                for(var i = p.length; i > 0; i--) {
                     // check if reference equals reference at index
                     if(val === p[i]) {
                         // ok there exists a key with the same object reference
@@ -76,18 +78,31 @@ module.exports = function () {
                 // get the array of values from the old key
                 var p = this.get(val[oldKey]);
                 // check if object reference is in the array
-                for(var i = 0; i < p.length; i++) {
-                    // check if reference equals reference at index
-                    if(val === p[i]) {
+                // loop backwards so we don't loop in the same direction as we're splicing
+                // Otherwise we miss half the references as splice() modifies the array in place
+                /*for(var i = p.length; i > 0; i--) {
+                    // check if reference at index equals reference to object
+                    if(p[i] === val) {
+                        console.log('Removing value from index', oldKey, p.length, i);
                         // remove reference with splice
                         p.splice(i, 1);
-                        // if this key contains no more values, remove it
-                        if(p.length === 0) {
-                            //console.log(':: KDVSET.update Removing empty key:', val[oldKey], p);
-                            this.remove(val[oldKey]);
-                        }
-                        break;
+                        break; // break because we do this for each found document
                     }
+                }*/
+                var i = p.length;
+                console.log(i);
+                while(i--) {
+                    if(p[i] === val) {
+                        console.log('Removing value from index', oldKey, p.length, i);
+                        // remove reference with splice
+                        p.splice(i, 1);
+                        break; // break because we do this for each found document (val) and there should only be one match possible
+                    }
+                }
+                // if this key contains no more values, remove it
+                if(p.length === 0) {
+                    //console.log(':: KDVSET.update Removing empty key:', val[oldKey], p);
+                    this.remove(val[oldKey]);
                 }
                 if(!remove) {
                     // insert the new key and value => object reference

@@ -187,8 +187,10 @@ UTIL.remover = function(collection, query, multi, matchAll) {
             console.log('=> Query is indexed via', p);
             indexedRecs = INDEXER.get(p, query[p]);
             if(indexedRecs) {
-                for(var i = 0; i < indexedRecs.length; i++) {
+                for(var i = indexedRecs.length; i > 0; i--) {
                     rec = indexedRecs[i];
+                    if(!rec) continue;
+
                     if(matchAll)
                         match = this.matchAll(rec, query);
                     else
@@ -198,7 +200,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                         for(var p in rec) {
                             if(p in INDEXER.INDECES) { // this field is indexed
                                 //console.log('UTIL.remover Updating indexed key', p);
-                                INDEXER.update(p, p, '', rec, true);
+                                INDEXER.update(p, p, '', rec, true); // remove indices for any indexed fields in this record
                             }
                         }
                         // We set each property to null, affecting the underlying memory, now we can't find it!

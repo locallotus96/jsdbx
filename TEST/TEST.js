@@ -94,7 +94,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
-  db[cName].findAny({ age: 50 });
+  console.log(db[cName].findAny({ age: 50 }));
   console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
@@ -135,7 +135,7 @@ function insertTestRecords(x, cName) {
           score: i,
           teacher: 'Tim',
           city: 'Cape Town',
-          age: Math.floor((Math.random() * 100) + 1)
+          age: Math.floor((Math.random() * 8000) + 1)
       });
   };
   console.timeEnd(':: Insert Time');
