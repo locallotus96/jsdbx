@@ -107,7 +107,6 @@ UTIL.finder = function(collection, query, multi, matchAll) {
                     else
                         match = this.matchOne(rec, query);
                     if(match) {
-                        // TODO: Remove duplicates at the end with getUniqueElements()
                         // check if we've already found this object (multi reference issue)
                         if(retDocs.indexOf(rec) >= 0) {
                         //    console.log('UTIL.finder Already found!');
@@ -116,7 +115,7 @@ UTIL.finder = function(collection, query, multi, matchAll) {
                         retDocs.push(indexedRecs[i]);
                         if(!multi) {
                             console.log('UTIL.finder Found One via index:', p);
-                            return retDocs; //this.getUniqueElements(retDocs);
+                            return retDocs; //this.getUniqueElements(retDocs); // slower
                         }
                     }
                 }
@@ -153,12 +152,11 @@ UTIL.finder = function(collection, query, multi, matchAll) {
             else
                 match = this.matchOne(rec, query);
             if(match) {
-                // TODO: Remove duplicates at the end with getUniqueElements()
                 // check if we've already found this object (multi reference issue)
-                //if(retDocs.indexOf(rec) >= 0) {
+                if(retDocs.indexOf(rec) >= 0) {
                 //    console.log('UTIL.finder Already found!!');
-                //    continue; // next loop cycle
-                //}
+                    continue; // next loop cycle
+                }
                 retDocs.push(rec);
                 if(!multi) {
                     break;
@@ -167,7 +165,7 @@ UTIL.finder = function(collection, query, multi, matchAll) {
         }
     }
     console.log('UTIL.finder Found', retDocs.length + ' documents in', i + ' iterations');
-    return retDocs; //this.getUniqueElements(retDocs);
+    return retDocs; //this.getUniqueElements(retDocs); // slower
 }
 
 UTIL.remover = function(collection, query, multi, matchAll) {
