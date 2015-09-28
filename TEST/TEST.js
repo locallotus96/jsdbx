@@ -83,6 +83,11 @@ function test() {
   console.timeEnd(':: Find Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Remove Time');
+  db[cName].remove({ age: 50 });
+  console.timeEnd(':: Remove Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   db.disconnect(cName, function(err) {
       if(err) {
           console.error('<DB> Error:', err);

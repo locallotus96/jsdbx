@@ -61,7 +61,7 @@ module.exports = function () {
                             p.splice(i, 1);
                             // if this index contains no more values, remove it
                             if(p.length === 0) {
-                                console.log(':: KDVSET.update Removing empty key:', oldKey);
+                                //console.log(':: KDVSET.update Removing empty key:', oldKey);
                                 this.remove(oldKey);
                             }
                             return true;

@@ -3,8 +3,9 @@ var fs = require('fs');
 var uuid = require('node-uuid');
 var merge = require('merge');
 
+var INDEXER = new(require('./INDEXER.js'));
+
 var UTIL = {}; // utility object (class)
-UTIL.INDEXER = require('./INDEXER.js');
 
 //--- UTILITIES
 
@@ -24,16 +25,16 @@ UTIL.addIDProperty = function (obj) {
 }
 
 UTIL.createIndex = function(field, collection) {
-    if(field in this.INDEXER.INDECES) {
+    if(field in INDEXER.INDECES) {
         return false; // index for this field exists
     } else {
-        this.INDEXER.build(field, collection);
+        INDEXER.build(field, collection);
         return true;
     }
 }
 
 UTIL.destroyIndex = function (field) {
-    return this.INDEXER.destroy(field);
+    return INDEXER.destroy(field);
 }
 
 /*
@@ -46,11 +47,11 @@ UTIL.inserter = function(collection, data) {
         for(var i = 0; i < data.length; i++) {
             obj = data[i];
             // check if new object contains a field to index on
-            for(var p in this.INDEXER.INDECES) {
+            for(var p in INDEXER.INDECES) {
                 // ok there's a field to index on
                 if(p in obj) {
                     // index this record
-                    this.INDEXER.add(p, obj);
+                    INDEXER.add(p, obj);
                 }
             }
             // check for [[obj,obj,],]
@@ -94,16 +95,17 @@ UTIL.finder = function(collection, query, multi, matchAll) {
     // INDEX SEARCH
     // check if we have an index for this search query
     for(var p in query) {
-        if(p in this.INDEXER.INDECES) { // this field is indexed
+        if(p in INDEXER.INDECES) { // this field is indexed
             indexed = true;
             console.log('=> Query is indexed via', p);
-            indexedRecs = this.INDEXER.get(p, query[p]);
+            indexedRecs = INDEXER.get(p, query[p]);
             if(indexedRecs) {
                 for(var i = 0; i < indexedRecs.length; i++) {
+                    rec = indexedRecs[i];
                     if(matchAll)
-                        match = this.matchAll(indexedRecs[i], query);
+                        match = this.matchAll(rec, query);
                     else
-                        match = this.matchOne(indexedRecs[i], query);
+                        match = this.matchOne(rec, query);
                     if(match) {
                         // TODO: Remove duplicates at the end with getUniqueElements()
                         // check if we've already found this object (multi reference issue)
@@ -113,7 +115,7 @@ UTIL.finder = function(collection, query, multi, matchAll) {
                         //}
                         retDocs.push(indexedRecs[i]);
                         if(!multi) {
-                            console.log('UTIL.finder Found One via index:\n', indexedRecs[i]);
+                            console.log('UTIL.finder Found One via index:', p);
                             return this.getUniqueElements(retDocs);
                         }
                     }
@@ -180,24 +182,24 @@ UTIL.remover = function(collection, query, multi, matchAll) {
     // INDEX SEARCH
     // check if we have an index for this search query
     for(var p in query) {
-        if(p in this.INDEXER.INDECES) { // this field is indexed
+        if(p in INDEXER.INDECES) { // this field is indexed
             indexed = true;
             console.log('=> Query is indexed via', p);
-            indexedRecs = this.INDEXER.get(p, query[p]);
+            indexedRecs = INDEXER.get(p, query[p]);
             if(indexedRecs) {
                 for(var i = 0; i < indexedRecs.length; i++) {
                     rec = indexedRecs[i];
                     if(matchAll)
-                        match = this.matchAll(indexedRecs[i], query);
+                        match = this.matchAll(rec, query);
                     else
-                        match = this.matchOne(indexedRecs[i], query);
+                        match = this.matchOne(rec, query);
                     if(match) {
                         // check if we should update any index for this record
                         for(var p in rec) {
-                            if(p in this.INDEXER.INDECES) { // this field changed
-                                console.log('UTIL.remover Updating indexed key', p);
+                            if(p in INDEXER.INDECES) { // this field changed
+                                //console.log('UTIL.remover Updating indexed key', p);
                                 //console.log(rec[p]);
-                                this.INDEXER.update(p, rec[p], rec[p], rec, true);
+                                INDEXER.update(p, rec[p], rec[p], rec, true);
                             }
                         }
                         //---
@@ -212,10 +214,9 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                         }
                         removed++;
                         if(!multi) {
-                            console.log('UTIL.remover Removed One via index:\n', rec);
+                            console.log('UTIL.remover Removed One via index:', p);
                             return removed;
                         }
-                        console.log('UTIL.remover Removed One via index:\n', rec);
                     }
                 }
             }
@@ -282,33 +283,33 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
     // INDEX SEARCH
     // check if we have an index for this search query
     for(var p in query) {
-        if(p in this.INDEXER.INDECES) { // this field is indexed
+        if(p in INDEXER.INDECES) { // this field is indexed
             indexed = true;
             console.log('=> Query is indexed via', p);
-            indexedRecs = this.INDEXER.get(p, query[p]);
+            indexedRecs = INDEXER.get(p, query[p]);
             if(indexedRecs) {
                 for(var i = 0; i < indexedRecs.length; i++) {
                     rec = indexedRecs[i];
                     if(matchAll)
-                        match = this.matchAll(indexedRecs[i], query);
+                        match = this.matchAll(rec, query);
                     else
-                        match = this.matchOne(indexedRecs[i], query);
+                        match = this.matchOne(rec, query);
                     if(match) {
                         rec = merge(rec, data);
                         updated++;
                         // check if we should update any index for this record
                         for(var p in rec) {
-                            if(p in this.INDEXER.INDECES) { // this field changed
+                            if(p in INDEXER.INDECES) { // this field changed
                                 console.log('UTIL.updater Updating indexed key', p);
                                 //console.log(rec[p]);
-                                this.INDEXER.update(p, rec[p], data[p], rec, false);
+                                INDEXER.update(p, rec[p], data[p], rec, false);
                             }
                         }
                         if(!multi) {
-                            console.log('UTIL.updater Updated One via index:\n', rec);
+                            console.log('UTIL.updater Updated One via index:', p);
                             return updated;
                         }
-                        console.log('UTIL.updater Updated One via index:\n', rec);
+                        console.log('UTIL.updater Updated One via index:', p);
                     }
                 }
             }

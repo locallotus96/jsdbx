@@ -36,4 +36,8 @@ INDEXER.destroy = function(field) {
     }
 }
 
-module.exports = INDEXER;
+// Allows using new INDEXER()
+module.exports = function() {
+    return INDEXER;
+}
+//module.exports = INDEXER;
