@@ -2,6 +2,7 @@
 var fs = require('fs');
 var uuid = require('node-uuid');
 var merge = require('merge');
+var stream = require('stream');
 
 var INDEXER = new(require('./INDEXER.js'));
 
@@ -709,11 +710,11 @@ UTIL.loadFileStreamLines = function (fd, callback) {
 }
 
 UTIL.streamToFile = function (fd, data, callback) {
-    if(!data.length) { // assuming a single object
+    if(!data.length && typeof(data) === 'object') { // assuming a single object
         data = [data];
     }
     //--- Writable Stream
-    var wstream = fs.createWriteStream(fd);
+    var wstream = fs.createWriteStream(fd, {'flags': 'w', 'encoding': 'utf-8'});
     wstream.on('error', function(err) {
         console.error(':: Error writing to file stream!', err);
         callback(err); // signal error to callback
@@ -727,11 +728,12 @@ UTIL.streamToFile = function (fd, data, callback) {
 }
 
 UTIL.streamLinesToFile = function (fd, data, callback) {
-    if(!data.length) { // assuming a single object
+    if(!data.length && typeof(data) === 'object') { // assuming a single object
         data = [data];
     }
     //--- Writable Stream
-    var wstream = fs.createWriteStream(fd);
+    var wstream = fs.createWriteStream(fd, {'flags': 'w', 'encoding': 'utf-8'});
+    var ok;
     wstream.on('error', function(err) {
         console.error(':: Error writing line to file stream!', err);
         callback(err); // signal error to callback
@@ -740,9 +742,22 @@ UTIL.streamLinesToFile = function (fd, data, callback) {
         console.log('<=> Done writing lines to file stream!');
         callback(false); // signal done to callback with no error
     });
-    for(var i = 0; i < data.length; i++) {
-        wstream.write(JSON.stringify(data[i]) + '\n');
+    var write = function () {
+        for(var i = 0; i < data.length; i++) {
+            ok = wstream.write(JSON.stringify(data[i]) + '\n');
+            /*if(!ok) {
+                // stops kernel memory buffer from flowing into userspace
+                // which can cause a write or memory error
+                //console.log('Draining');
+                wstream.once('Drain', write); // listener is not calling write again
+                break;
+            }*/
+        }
     }
+    write();
+    //data.forEach(function(obj) { // no real performance difference
+    //    wstream.write(JSON.stringify(obj) + '\n');
+    //});
     wstream.end(); // emits 'finish' event
 }
 
@@ -751,8 +766,8 @@ UTIL.streamLinesToFile = function (fd, data, callback) {
 // javascript can't serialize like other languages...
 UTIL.streamFromFile = function (fd, callback) {
     //--- Readable Stream
-    var rstream = fs.createReadStream(fd);
-    rstream.setEncoding('utf8');
+    var rstream = fs.createReadStream(fd, {'encoding': 'utf-8'});
+    //rstream.setEncoding('utf8');
     var data = '';
     rstream.on('error', function(err) {
         console.error(':: Error reading from file stream!', err);
@@ -777,7 +792,7 @@ UTIL.streamLinesFromFile = function (fd, callback) {
     // Read lines via stream (slower)
     var data = [];
     var rl = require('readline').createInterface({
-        input: fs.createReadStream(fd)
+        input: fs.createReadStream(fd, {'encoding': 'utf-8'})
     });
 
     rl.on('line', function (line) {
@@ -787,10 +802,30 @@ UTIL.streamLinesFromFile = function (fd, callback) {
     });
 
     rl.on('close', function () {
-        console.log(':: Done Streaming Lines - Closing File');
+        console.log(':: Done streaming lines - closing file');
         callback(null, data);
     });
 }
+
+// Same performance as streamLinesToFile
+/*UTIL.streamLinesFromFile2 = function (fd, callback) {
+    var data = [];
+    //--- Writable Stream
+    lr = new(require('line-by-line'));
+    lr.on('error', function(err) {
+        console.error(':: Error reading line from file!', err);
+        callback(err); // signal error to callback
+    });
+    lr.on('line', function (line) {
+        // 'line' contains the current line without the trailing newline character.
+        data[data.length] = JSON.parse(line);
+    });
+    lr.on('end', function () {
+        // All lines are read, file is closed now.
+        console.log(':: Done reading lines - closing file');
+        callback(null, data);
+    });
+}*/
 
 UTIL.readFromFileSync = function (fd) {
     return fs.readFileSync(fd, 'utf-8');

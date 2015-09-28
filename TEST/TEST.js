@@ -25,7 +25,7 @@ function test() {
   console.log('<DB> Current Collection: ', db[cName].C_NAME);
   console.log('<DB> Current Records:', db[cName].count());
 
-  insertTestRecords(10001, cName);
+  insertTestRecords(250000, cName);
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find One Time');
@@ -175,7 +175,7 @@ function insertTestRecords(x, cName) {
           score: i,
           teacher: 'Tim',
           city: 'Cape Town',
-          age: Math.floor((Math.random() * 100) + 1)
+          age: Math.floor((Math.random() * 10000) + 1)
       });
   };
   console.timeEnd(':: Insert Time');
