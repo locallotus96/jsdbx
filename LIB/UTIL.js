@@ -108,11 +108,12 @@ UTIL.finder = function(collection, query, multi, matchAll) {
                         match = this.matchOne(rec, query);
                     if(match) {
                         // check if we've already found this object (multi reference issue)
-                        if(retDocs.indexOf(rec) >= 0) {
-                        //    console.log('UTIL.finder Already found!');
+                        //if(retDocs.indexOf(rec) >= 0) {
+                        if(this.listContains(retDocs, rec)) {
+                            //console.log('UTIL.finder Already found!');
                             continue; // next loop cycle
                         }
-                        retDocs.push(indexedRecs[i]);
+                        retDocs.push(rec);
                         if(!multi) {
                             console.log('UTIL.finder Found One via index:', p);
                             return retDocs; //this.getUniqueElements(retDocs); // slower
@@ -153,8 +154,9 @@ UTIL.finder = function(collection, query, multi, matchAll) {
                 match = this.matchOne(rec, query);
             if(match) {
                 // check if we've already found this object (multi reference issue)
-                if(retDocs.indexOf(rec) >= 0) {
-                //    console.log('UTIL.finder Already found!!');
+                //if(retDocs.indexOf(rec) >= 0) {
+                if(this.listContains(retDocs, rec)) {
+                    //console.log('UTIL.finder Already found!!');
                     continue; // next loop cycle
                 }
                 retDocs.push(rec);
