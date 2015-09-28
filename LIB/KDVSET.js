@@ -46,17 +46,19 @@ module.exports = function () {
     // TODO: Put update for removal in own function
     // Proceed with caution...
     this.update = function (oldKey, newKey, val, remove) {
-        if(this.contains(val[oldKey])) { // check that the old key exists
-            if(this.contains(val[newKey])) { // the new key exists
+        if(this.contains(oldKey)) { // check that the old key exists
+            if(this.contains(newKey)) { // the new key exists
+                console.log('Contains old and new key!!!');
                 // Now we need to check if the key contains a pointer to the object
                 // get the array of values from the key
-                var p = this.get(val[newKey]);
+                var p = this.get(oldKey);
+                //console.log(oldKey);
+                //console.log(newKey);
+                //console.log(p);
                 // check if object reference is in the array
                 // loop backwards so we don't loop in the same direction as we're splicing
                 // Otherwise we miss half the references as splice() modifies the array in place
-                var i = p.length;
-                console.log(i);
-                while(i--) {
+                for(var i = p.length-1; i >= 0; i--) {
                     // check if reference equals reference at index
                     if(p[i] === val) {
                         if(remove) { // we aim to remove this key
@@ -65,9 +67,12 @@ module.exports = function () {
                             // if this index contains no more values, remove it
                             if(p.length === 0) {
                                 //console.log(':: KDVSET.update Removing empty key:', oldKey);
-                                this.remove(val[oldKey]);
+                                this.remove(oldKey);
                             }
                             return true;
+                        } else {
+                            console.log('Updating key', oldKey);
+                            //p[i][oldKey] = oldKey;
                         }
                         return false; // bail out
                     }
@@ -77,12 +82,11 @@ module.exports = function () {
             } else { // the new key does not exist
                 // Now we need to remove the matching object reference for the new key from the old key
                 // get the array of values from the old key
-                var p = this.get(val[oldKey]);
+                var p = this.get(oldKey);
                 // check if object reference is in the array
                 // loop backwards so we don't loop in the same direction as we're splicing
                 // Otherwise we miss half the references as splice() modifies the array in place
-                var i = p.length;
-                while(i--) {
+                for(var i = p.length-1; i >= 0; i--) {
                     // check if reference equals reference at index
                     if(p[i] === val) {
                         // ok there exists a key with the same object reference
@@ -94,18 +98,18 @@ module.exports = function () {
                 // if this key contains no more values, remove it
                 if(p.length === 0) {
                     //console.log(':: KDVSET.update Removing empty key:', val[oldKey], p);
-                    this.remove(val[oldKey]);
+                    this.remove(oldKey);
                 }
                 if(!remove) {
                     // insert the new key and value => object reference
-                    this.add(val[newKey], val);
+                    this.add(newKey, val);
                 }
             }
             return true;
         } else { // oldKey isn't even here, insert newKey
             if(!remove) { // we're not here to delete this missing key
                 // insert the new key and value => object reference
-                this.add(val[newKey], val);
+                this.add(newKey, val);
                 return true;
             }
             //console.log(':: KDVSET.update Old key not found!');

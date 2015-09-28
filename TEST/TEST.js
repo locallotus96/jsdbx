@@ -25,7 +25,7 @@ function test() {
   console.log('<DB> Current Collection: ', db[cName].C_NAME);
   console.log('<DB> Current Records:', db[cName].count());
 
-  insertTestRecords(100000, cName);
+  insertTestRecords(1000, cName);
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find One Time');
@@ -91,6 +91,26 @@ function test() {
   console.time(':: Remove Time');
   db[cName].remove({ age: 50 });
   console.timeEnd(':: Remove Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find Time');
+  db[cName].find({ age: 50 });
+  console.timeEnd(':: Find Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find Time');
+  db[cName].find({ age: 10 });
+  console.timeEnd(':: Find Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Update Time');
+  db[cName].update({ age: 10 }, { age: 50 });
+  console.timeEnd(':: Update Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find Time');
+  db[cName].find({ age: 10 });
+  console.timeEnd(':: Find Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Time');

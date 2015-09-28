@@ -188,8 +188,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
             indexedRecs = INDEXER.get(p, query[p]);
             if(indexedRecs) {
                 // loop backwards due to INDEXER.update splicing stored values pointing to the record
-                var j = indexedRecs.length;
-                while(j--) {
+                for(var j = indexedRecs.length-1; j >= 0; j--) {
                     rec = indexedRecs[j];
                     if(!rec) continue;
 
@@ -202,7 +201,7 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                         for(var p in rec) {
                             if(p in INDEXER.INDECES) { // this field is indexed
                                 //console.log('UTIL.remover Updating indexed key', p);
-                                INDEXER.update(p, p, '', rec, true); // remove indices for any indexed fields in this record
+                                INDEXER.update(p, rec[p], '', rec, true); // remove indices for any indexed fields in this record
                             }
                         }
                         // We set each property to null, affecting the underlying memory, now we can't find it!
@@ -211,7 +210,6 @@ UTIL.remover = function(collection, query, multi, matchAll) {
                         }
                         removed++;
                         if(!multi) {
-                            console.log('UTIL.remover Removed One via index:', p);
                             return removed;
                         }
                     }
@@ -285,28 +283,28 @@ UTIL.updater = function(collection, query, data, multi, matchAll) {
             console.log('=> Query is indexed via', p);
             indexedRecs = INDEXER.get(p, query[p]);
             if(indexedRecs) {
-                for(var i = 0; i < indexedRecs.length; i++) {
-                    rec = indexedRecs[i];
+                // loop backwards due to INDEXER.update splicing stored values pointing to the record
+                for(var j = indexedRecs.length-1; j >= 0; j--) {
+                //for(var i = 0; i < indexedRecs.length; i++) {
+                    rec = indexedRecs[j];
                     if(matchAll)
                         match = this.matchAll(rec, query);
                     else
                         match = this.matchOne(rec, query);
                     if(match) {
-                        rec = merge(rec, data);
-                        updated++;
                         // check if we should update any index for this record
                         for(var p in rec) {
                             if(p in INDEXER.INDECES) { // this field changed
                                 console.log('UTIL.updater Updating indexed key', p);
-                                //console.log(rec[p]);
+                                //console.log(p, rec[p], data[p], rec, false);
                                 INDEXER.update(p, rec[p], data[p], rec, false);
                             }
                         }
+                        rec = merge(rec, data);
+                        updated++;
                         if(!multi) {
-                            console.log('UTIL.updater Updated One via index:', p);
                             return updated;
                         }
-                        console.log('UTIL.updater Updated One via index:', p);
                     }
                 }
             }
