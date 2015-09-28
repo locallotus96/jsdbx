@@ -48,13 +48,9 @@ module.exports = function () {
     this.update = function (oldKey, newKey, val, remove) {
         if(this.contains(oldKey)) { // check that the old key exists
             if(this.contains(newKey)) { // the new key exists
-                console.log('Contains old and new key!!!');
                 // Now we need to check if the key contains a pointer to the object
                 // get the array of values from the key
                 var p = this.get(oldKey);
-                //console.log(oldKey);
-                //console.log(newKey);
-                //console.log(p);
                 // check if object reference is in the array
                 // loop backwards so we don't loop in the same direction as we're splicing
                 // Otherwise we miss half the references as splice() modifies the array in place
@@ -70,7 +66,7 @@ module.exports = function () {
                                 this.remove(oldKey);
                             }
                         } else {
-                            this.remove(oldKey);
+                            this.remove(oldKey); // remove old key if updating
                             this.add(newKey, val);
                         }
                         return true;
@@ -111,7 +107,6 @@ module.exports = function () {
                 this.add(newKey, val);
                 return true;
             }
-            //console.log(':: KDVSET.update Old key not found!');
             return false;
         }
     }
