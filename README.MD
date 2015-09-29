@@ -16,50 +16,50 @@
 
 > var db = require('./LIB/JSDBX.js')
 
-path is path to the collection(s) and collection is the name of the specific collection to connect  
+path is path to the collection and collection is the name of the collection to connect to
 callback takes an err parameter to signal successful connection/disconnection or failure thereof  
 > db.connect(path, collection, callback)  
 > db.disconnect(path, collection, callback)
 
-#### Don't call these methods from db.collection
-###### (mind the other exposed vars as well)
-used by db.connect()  
-> db.collection => load(callback)  
-
-used by db.disconnect()  
-> db.collection => save(callback)  
-
 #### Creating/Removing indices
 key is a string of the field/property name to index on  
-> db.collection ===> createIndex(key)  
-> db.collection ===> removeIndex(key)  
+> db.collection.createIndex(key)  
+> db.collection.removeIndex(key)  
 
 #### Inserting data
 data can be a single object or an array of objects
-> db.collection =====> insert(data)  
+> db.collection.insert(data)  
 
 #### Finding
 query is an object with keys/values to search for  
-> db.collection =======> find(query)  
-> db.collection =======> findOne(query)  
-> db.collection =======> findAny(query)  
-> db.collection =======> findAnyOne(query)  
+> db.collection.find(query)  
+> db.collection.findOne(query)  
+> db.collection.findAny(query)  
+> db.collection.findAnyOne(query)  
 
 #### Updating
 data is an object of keys/values to merge with a matching object  
-> db.collection =========> update(query, data)  
-> db.collection =========> updateOne(query, data)  
-> db.collection =========> updateAny(query, data)  
-> db.collection =========> updateAnyOne(query, data)  
+> db.collection.update(query, data)  
+> db.collection.updateOne(query, data)  
+> db.collection.updateAny(query, data)  
+> db.collection.updateAnyOne(query, data)  
 
 #### Removing
-> db.collection ===========> remove(query)  
-> db.collection ===========> removeOne(query)  
-> db.collection ===========> removeAny(query)  
-> db.collection ===========> removeAnyOne(query)  
+> db.collection.remove(query)  
+> db.collection.removeOne(query)  
+> db.collection.removeAny(query)  
+> db.collection.removeAnyOne(query)  
 
 #### Total records
-> db.collection =============> count()  
+> db.collection.count()  
+
+#### Don't call these methods from db.collection
+###### (mind the other exposed vars as well)
+used by db.connect()  
+> db.collection.load(callback)  
+
+used by db.disconnect()  
+> db.collection.save(callback)  
 
 ### Architecture:
 > <=> JSDBX  
