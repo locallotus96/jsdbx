@@ -2,6 +2,8 @@
 var fs = require('fs');
 var stream = require('stream');
 
+// TODO: Move All file operations to own class - FILER
+
 //-- UTILITIES - Helper Functions
 
 var UTIL = {}; // utility object (class)
@@ -265,7 +267,7 @@ UTIL.saveFileStream = function (fd, collection, callback) {
         this.filterDeleted(collection);
         console.timeEnd('<=> Filter Null Records Time');
         this.busyWriteStreaming = true;
-        console.log('<=> Streaming to: ', fd + ' Old File Size:', this.getFilesizeInMBytes(fd));
+        console.log('<=> Streaming to:', fd + ' Old File Size:', this.getFilesizeInMBytes(fd));
         console.time('<=> Write File Stream Time');
         this.streamLinesToFile(fd, collection, function(err) {
             UTIL.busyWriteStreaming = false;
@@ -687,8 +689,4 @@ UTIL.getFilesizeInMBytes = function (fd) {
     }
 }
 
-// Allows using new UTIL()
-module.exports = function() {
-    return UTIL;
-}
-//module.exports = UTIL;
+module.exports = UTIL;

@@ -25,6 +25,7 @@ var db = {
         console.error('<DB> Connecting to:', path + '/' + collection);
         if(this[collection]) {
             console.error('<DB> Already connected to:', path + '/' + collection);
+            callback('Already connected to: ' + path + '/' + collection);
             return;
         }
         if (UTIL.isValidPath(path)) {
@@ -46,34 +47,31 @@ var db = {
                 this.loadCollections(collection, callback);
             }
         }
-        return this;
     },
     disconnect: function(collection, callback) {
         if(!this[collection]) {
             console.log(msg.loadCollection_initialize);
             console.log('<DB> Cannot disconnect from unknown collection!');
-            callback(false);
+            callback('Cannot disconnect from unknown collection!');
         } else {
             console.log('<DB> Saving collection before disconnecting...');
             this[collection].save(function(err) {
                 if(err) {
                     console.error('<DB> Error saving collection!', err);
-                    callback(err);
                 } else {
                   console.log('<DB> Collection saved! Clearing memory and disconnecting...');
                   db[collection] = undefined;
                   db._db = undefined;
-                  callback();
                 }
+                callback(err);
             });
 
         }
-        return true;
     },
     loadCollections: function(collection, callback) {
         if (!this._db) {
             console.log(msg.loadCollection_initialize);
-            return false;
+            callback(msg.loadCollection_initialize);
         }
         if (typeof collection === 'string' && collection.length > 0) {
             var p = path.join(this._db.path, (collection.indexOf('.db') >= 0 ? collection : collection + '.db'));
@@ -82,7 +80,7 @@ var db = {
                 UTIL.resetFileSync(p);
             }
             var _c = collection.replace('.db', '');
-            this[_c] = new require('./DAL.js')(this, _c, new UTIL);
+            this[_c] = new require('./DAL.js')(path.join(this._db.path, (_c + '.db')), _c);
             console.log('<DB> Loading Collection:', _c);
             this[_c].load(function(err) {
                 if(err) {
@@ -95,7 +93,6 @@ var db = {
         } else {
             console.log('<DB> Invalid Collection Name String!');
         }
-        return this;
     }
 };
 

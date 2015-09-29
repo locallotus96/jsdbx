@@ -11,14 +11,14 @@ db.connect('DB/TEST', cName, function(err) {
 });
 
 console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-var cName2 = 'test';
-/*db.connect('DB/TEST', cName2, function(err) {
+var cName2 = 'mock';
+db.connect('DB/TEST', cName2, function(err) {
     if(err) {
         console.log('<DB> Error:', err);
     } else {
         test2();
     }
-});*/
+});
 
 //--------------------------------------------------------------
 function test() {
