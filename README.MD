@@ -1,14 +1,16 @@
 # JavaScript DBX
-## A json object database in node.js
-
-> Supports indexing on any field(s) for faster searches
-  - Indices are dynamically maintained
+## A little (WIP) json object database in node.js
 
 > Supports basic queries on multiple fields:  
   - Find One  
   - Find Many  
   -- Match on all fields  
   -- Match on any field  
+
+> Supports indexing on any field(s) for faster searches
+  - Indices are dynamically maintained
+
+> Supports connections to multiple collections
 
 ### API:
 
@@ -65,3 +67,8 @@ used by db.disconnect()
 ### Architecture:
 > <=> JSDBX  
 >     :: <=> new DAL() => new PERSISTENCE() => new INDEXER() => new KDVSET()  
+
+### Future Plans
+I plan to get this running in it's own server process(s) with a client library you can use to connect to it.
+I'd also like to port it to Python, or parts of it and see how it performs.
+Querying could probably be improved / expanded but this is JavaScript afterall...
