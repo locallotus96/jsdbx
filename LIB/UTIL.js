@@ -648,7 +648,8 @@ UTIL.saveFileStreamLines = function (fd, collection, callback) {
         console.log('<=> Streaming lines. Old File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Saving File:', fd);
         console.time('<=> Write File Stream Lines Time');
-        this.streamLinesToFile(fd, collection, function(err) { // very slow, ~30sec for 1mil rec
+        // very slow, ~30sec for 1mil rec, now ~5sec with writing strings of lines
+        this.streamLinesToFile(fd, collection, function(err) {
         //this.bufferWriteFileSync(fd, collection, function(err) { // ~2sec for 1mil rec
             UTIL.busyWriteStreaming = false;
             console.log('<=> Write File Stream Lines Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
@@ -789,17 +790,28 @@ UTIL.streamLinesToFile = function (fd, data, callback) {
         console.log('<=> Done writing lines to file stream!');
         callback(false); // signal done to callback with no error
     });
+    var sout = '';
+    var lCount = 0;
+    var lMax = 1024 < data.length ? 1024 : data.length;
+    console.log('<=> Max lines to buffer', lMax);
     var write = function () {
         for(var i = 0; i < data.length; i++) {
-            ok = wstream.write(JSON.stringify(data[i]) + '\n');
-            /*if(!ok) {
-                // stops kernel memory buffer from flowing into userspace
-                // which can cause a write or memory error
-                // this happens because the writer can't keep up with the data coming in
-                //console.log('Draining');
-                wstream.once('Drain', write); // listener is not calling write again
-                break;
-            }*/
+            sout += JSON.stringify(data[i]) + '\n';
+            lCount++;
+            if(lCount === lMax || i === data.length-1) {
+                //ok = wstream.write(JSON.stringify(data[i])) + '\n');
+                ok = wstream.write(sout);
+                sout = '';
+                lCount = 0;
+                /*if(!ok) {
+                    // stops kernel memory buffer from flowing into userspace
+                    // which can cause a write or memory error
+                    // this happens because the writer can't keep up with the data coming in
+                    //console.log('Draining');
+                    wstream.once('Drain', write); // listener is not calling write again
+                    break;
+                }*/
+            }
         }
     }
     write();
