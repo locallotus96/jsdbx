@@ -10,10 +10,6 @@
   -- Match on all fields  
   -- Match on any field  
 
-I hit max records at just over 1750000 (1.75 mil) records given my test insertion.  
-This safely saved 253MB of data from a json stringified array of objects.  
-JSON.stringify and JSON.parse can't deal with more data on my machine.  
-
 ### API:
 
 #### Loading the module and connecting to a collection

@@ -25,7 +25,7 @@ function test() {
   console.log('<DB> Current Collection: ', db[cName].C_NAME);
   console.log('<DB> Current Records:', db[cName].count());
 
-  insertTestRecords(1000000, cName);
+  insertTestRecords(100000, cName);
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find One Time');
