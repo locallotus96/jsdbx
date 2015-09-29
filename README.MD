@@ -16,7 +16,8 @@
 
 > var db = require('./LIB/JSDBX.js')
 
-path is path to the collection and collection is the name of the collection to connect to  
+path is the path from the base directory to the collection  
+collection is the name of the collection to connect to  
 callback takes an err parameter to signal successful connection/disconnection or failure thereof  
 > db.connect(path, collection, callback)  
 > db.disconnect(path, collection, callback)
