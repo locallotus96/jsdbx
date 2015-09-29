@@ -3,9 +3,16 @@
 var path = require('path');
 
 module.exports = function(db, collectionName, UTIL) {
+    //--- DATA ACCESS LAYER API
+
     var DAL = {}; // data access layer object (class), gets exported
-    // TODO: Consider persistence to be static (no using new)
-    var PERSISTENCE = require('./PERSISTENCE.js')(UTIL);
+    // TODO: Consider persistence to be static (no using new),
+    // but for now we need to pass the new UTIL obj from JSDBX
+    // for file operations to interleave with multiple connections
+    // due to global vars that need be unique per instance
+    // But moving the COLLECTION to util will require new anyway
+    // Then DAL could become static?
+    var PERSISTENCE = new require('./PERSISTENCE.js')(UTIL);
 
     // PUBLIC VARIABLES
     DAL.C_NAME = collectionName;
@@ -15,8 +22,6 @@ module.exports = function(db, collectionName, UTIL) {
     DAL.LOADING = false;
     DAL.SAVING = false;
     DAL.COLLECTION = []; // documents / collection of javascript objects
-
-    //--- DATA ACCESS LAYER API
 
     DAL.load = function (callback) {
         if(!this.LOADING) {

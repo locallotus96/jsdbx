@@ -2,9 +2,9 @@
 var fs = require('fs');
 var stream = require('stream');
 
-var UTIL = {}; // utility object (class)
+//-- UTILITIES - Helper Functions
 
-//--- UTILITIES
+var UTIL = {}; // utility object (class)
 
 /*
     A helper function to return whether or not a document contains

@@ -1,6 +1,3 @@
-/*
-  TODO: Consider persistence to be static (no using new in DAL)
-*/
 'use strict';
 var uuid = require('node-uuid');
 var merge = require('merge');
@@ -33,6 +30,8 @@ var STREAM_DELETE = new READABLE; // SOURCE_DELETE
 var SINK_INSERT = new Sink;
 var SINK_UPDATE = new Sink;
 var SINK_DELETE = new Sink;
+
+//--- PERSISTENCE LAYER
 
 var PERSISTENCE = {};
 var UTIL = {}; // UTIL gets passed through constructor in module.exports

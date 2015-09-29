@@ -12,7 +12,7 @@ var path = require('path');
 var mkdirp = require('mkdirp');
 
 //local modules
-var UTIL = new(require('./UTIL.js'));
+var UTIL = require('./UTIL.js');
 
 var msg = {
     connect_success: '<DB> Successfully connected to : ',
@@ -82,7 +82,7 @@ var db = {
                 UTIL.resetFileSync(p);
             }
             var _c = collection.replace('.db', '');
-            this[_c] = new require('./DAL.js')(this, _c, UTIL);
+            this[_c] = new require('./DAL.js')(this, _c, new UTIL);
             console.log('<DB> Loading Collection:', _c);
             this[_c].load(function(err) {
                 if(err) {
