@@ -1,5 +1,5 @@
 # JavaScript DBX
-## A little (WIP) json object database in node.js
+## (WIP) A little json database in node.js
 
 > Supports basic queries on multiple fields:  
   - Find One  
