@@ -10,19 +10,25 @@ var UTIL = {}; // utility object (class)
 
 //--- UTILITIES
 
-// Add the _id property to each object
+// TODO: If obj has _id, check if it exists via index on _id, and check form of _id
+// Add the _id property to each object and check if it should be indexed
 UTIL.addIDProperty = function (obj) {
     if(obj.length) { // assuming an array
         for(var i = 0; i < obj.length; i++) {
             if(!obj[i]['_id'])
                 obj[i]._id = uuid.v4().replace(/-/g, '');
+            for(var p in INDEXER.INDECES) // check if new object contains a field to index on
+                if(p in obj) // ok there's a field to index on
+                    INDEXER.add(p, obj); // index this record
         }
-        return obj;
     } else { // single object
         if(!obj['_id'])
             obj._id = uuid.v4().replace(/-/g, '')
-        return obj;
+        for(var p in INDEXER.INDECES) // check if new object contains a field to index on
+            if(p in obj) // ok there's a field to index on
+                INDEXER.add(p, obj); // index this record
     }
+    return obj;
 }
 
 UTIL.createIndex = function(field, collection) {
@@ -47,16 +53,8 @@ UTIL.inserter = function(collection, data) {
         var obj = {};
         for(var i = 0; i < data.length; i++) {
             obj = data[i];
-            // check if new object contains a field to index on
-            for(var p in INDEXER.INDECES) {
-                // ok there's a field to index on
-                if(p in obj) {
-                    // index this record
-                    INDEXER.add(p, obj);
-                }
-            }
             // check for [[obj,obj,],]
-            if(obj.length > 0) { // array of objects hopefully
+            if(obj.length && typeof obj === 'object') { // array of objects hopefully
                 collection.concat(this.addIDProperty(obj));
                 inserted += obj.length;
             } else if(typeof obj === 'object') { // single object

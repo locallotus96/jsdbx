@@ -1,4 +1,4 @@
 #!/bin/bash
 git add .
-git commit -m 'further improved file read/write speeds'
+git commit -m 'refactor'
 git push -u origin master
