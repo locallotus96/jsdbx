@@ -874,7 +874,7 @@ UTIL.bufferWriteFileSync = function (fd, data, callback) {
     callback(false);
 }
 
-// ~ Same performance as streamLinesFromFile
+// ~ Same performance as streamFromFile3
 UTIL.bufferReadFileSync = function (fd, callback) {
     var i = fs.openSync(fd, 'r');
     var bin = new Buffer(1024 * 1024);
