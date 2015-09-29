@@ -22,7 +22,7 @@ callback takes an err parameter to signal successful connection/disconnection or
 > db.connect(path, collection, callback)  
 > db.disconnect(path, collection, callback)
 
-#### Creating/Removing indices
+#### Creating / Removing indices
 key is a string of the field/property name to index on  
 > db.collection.createIndex(key)  
 > db.collection.removeIndex(key)  
@@ -64,4 +64,4 @@ used by db.disconnect()
 
 ### Architecture:
 > <=> JSDBX  
->     :: <=> new DAL() => new PERSISTENCE() => new INDEXER => new KDVSET  
+>     :: <=> new DAL() => new PERSISTENCE() => new INDEXER() => new KDVSET()  
