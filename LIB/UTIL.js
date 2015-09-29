@@ -617,8 +617,7 @@ UTIL.saveFileStream = function (fd, collection, callback) {
         this.filterDeleted(collection);
         console.timeEnd('<=> Filter Null Records Time');
         this.busyWriteStreaming = true;
-        console.log('<=> Streaming. Old File Size:', this.getFilesizeInMBytes(fd));
-        console.log('<=> Saving File:', fd);
+        console.log('<=> Streaming to: ', fd + ' Old File Size:', this.getFilesizeInMBytes(fd));
         console.time('<=> Write File Stream Time');
         this.streamLinesToFile(fd, collection, function(err) {
             UTIL.busyWriteStreaming = false;
@@ -637,14 +636,12 @@ UTIL.loadFileStream = function (fd, callback) {
         console.log(':: Error Opening File! Check File Name or Permissions...');
         callback(true);
     } else {
-        console.log('<=> Streaming... File Size:', this.getFilesizeInMBytes(fd));
-        console.log('<=> Loading File:', fd);
+        console.log('<=> Streaming from:', fd + ' File Size:', this.getFilesizeInMBytes(fd));
         console.time('<=> Read File Stream Time');
         this.streamFromFile3(fd, function(err, data) {
             console.timeEnd('<=> Read File Stream Time');
             if(!err) {
                 if(data.length > 0 && typeof(data) === 'object') {
-                    console.log('<=> Loaded Collection:', data.length + ' records');
                     callback(null, data);
                 } else {
                     callback(null, null); // no error but no data either, empty/new file
