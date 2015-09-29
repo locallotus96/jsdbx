@@ -1,10 +1,11 @@
 'use strict';
 
 var path = require('path');
-//var UTIL = new(require('./UTIL.js'));
 
 module.exports = function(db, collectionName, UTIL) {
-    var DAL = {}; // data access layer object (class)
+    var DAL = {}; // data access layer object (class), gets exported
+    // TODO: Consider persistence to be static (no using new)
+    var PERSISTENCE = require('./PERSISTENCE.js')(UTIL);
 
     // PUBLIC VARIABLES
     DAL.C_NAME = collectionName;
@@ -20,7 +21,7 @@ module.exports = function(db, collectionName, UTIL) {
     DAL.load = function (callback) {
         if(!this.LOADING) {
             this.LOADING = true;
-            UTIL.loadCollection(this.FILE, function(err, data) {
+            PERSISTENCE.loadCollection(this.FILE, function(err, data) {
                 if(!err && data) { // no error and data was returned
                      DAL.COLLECTION = data; // point the collection object to the array of data from file
                 }
@@ -35,7 +36,7 @@ module.exports = function(db, collectionName, UTIL) {
     DAL.save = function (callback) {
         if(!this.SAVING) {
             this.SAVING = true;
-            UTIL.saveCollection(this.FILE, this.COLLECTION, function(err) {
+            PERSISTENCE.saveCollection(this.FILE, this.COLLECTION, function(err) {
                 DAL.SAVING = false;
                 callback(err);
             });
@@ -45,7 +46,7 @@ module.exports = function(db, collectionName, UTIL) {
     }
 
     DAL.createIndex = function (field) {
-        if(UTIL.createIndex(field, this.COLLECTION)) {
+        if(PERSISTENCE.createIndex(field, this.COLLECTION)) {
             return true;
         } else {
             return false;
@@ -53,7 +54,7 @@ module.exports = function(db, collectionName, UTIL) {
     }
 
     DAL.removeIndex = function (field) {
-        if(UTIL.destroyIndex(field)) {
+        if(PERSISTENCE.destroyIndex(field)) {
             return true;
         } else {
             return false;
@@ -71,63 +72,63 @@ module.exports = function(db, collectionName, UTIL) {
         if(typeof data !== 'object') {
             return 0; // invalid data
         }
-        return UTIL.inserter(this.COLLECTION, data);
+        return PERSISTENCE.inserter(this.COLLECTION, data);
     }
 
     DAL.findOne = function (query) {
         if(!query) {
             return [];
         }
-        return (UTIL.finder(this.COLLECTION, query, false, true))[0];
+        return (PERSISTENCE.finder(this.COLLECTION, query, false, true))[0];
     }
 
     DAL.findAnyOne = function (query) {
         if(!query) {
             return [];
         }
-        return (UTIL.finder(this.COLLECTION, query, false, false))[0];
+        return (PERSISTENCE.finder(this.COLLECTION, query, false, false))[0];
     }
 
     DAL.find = function (query) {
         if(!query) {
             return this.COLLECTION;
         }
-        return UTIL.finder(this.COLLECTION, query, true, true);
+        return PERSISTENCE.finder(this.COLLECTION, query, true, true);
     }
 
     DAL.findAny = function (query) {
         if(!query) {
             return this.COLLECTION;
         }
-        return UTIL.finder(this.COLLECTION, query, true, false);
+        return PERSISTENCE.finder(this.COLLECTION, query, true, false);
     }
 
     DAL.updateOne = function (query, data) {
         if(!query || !data) {
             return 0;
         }
-        return UTIL.updater(this.COLLECTION, query, data, false, true);
+        return PERSISTENCE.updater(this.COLLECTION, query, data, false, true);
     }
 
     DAL.updateAnyOne = function (query, data) {
         if(!query || !data) {
             return 0;
         }
-        return UTIL.updater(this.COLLECTION, query, data, false, false);
+        return PERSISTENCE.updater(this.COLLECTION, query, data, false, false);
     }
 
     DAL.update = function (query, data) {
         if(!query || !data) {
             return 0;
         }
-        return UTIL.updater(this.COLLECTION, query, data, true, true);
+        return PERSISTENCE.updater(this.COLLECTION, query, data, true, true);
     }
 
     DAL.updateAny = function (query, data) {
         if(!query || !data) {
             return 0;
         }
-        return UTIL.updater(this.COLLECTION, query, data, true, false);
+        return PERSISTENCE.updater(this.COLLECTION, query, data, true, false);
         return updated;
     }
 
@@ -135,28 +136,28 @@ module.exports = function(db, collectionName, UTIL) {
         if(!query) {
             return 0;
         }
-        return UTIL.remover(this.COLLECTION, query, false, true);
+        return PERSISTENCE.remover(this.COLLECTION, query, false, true);
     }
 
     DAL.removeAnyOne = function (query) {
         if(!query) {
             return 0;
         }
-        return UTIL.remover(this.COLLECTION, query, false, false);
+        return PERSISTENCE.remover(this.COLLECTION, query, false, false);
     }
 
     DAL.remove = function (query) {
         if(!query) {
             return 0;
         }
-        return UTIL.remover(this.COLLECTION, query, true, true);
+        return PERSISTENCE.remover(this.COLLECTION, query, true, true);
     }
 
     DAL.removeAny = function (query) {
         if(!query) {
             return 0;
         }
-        return UTIL.remover(this.COLLECTION, query, true, false);
+        return PERSISTENCE.remover(this.COLLECTION, query, true, false);
     }
 
     return DAL;

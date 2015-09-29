@@ -13,6 +13,7 @@ var mkdirp = require('mkdirp');
 
 //local modules
 var UTIL = new(require('./UTIL.js'));
+
 var msg = {
     connect_success: '<DB> Successfully connected to : ',
     connect_error_db_path:'<DB> The DB Path "%s" is not valid. Creating path...',
