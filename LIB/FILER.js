@@ -36,6 +36,7 @@ var SINK_DELETE = new Sink;
 
 var FILER = {};
 
+// messes with multiple connections, so never set to true
 FILER.busyWriteStreaming = false; // are we currently streaming to the file?
 
 FILER.saveFileStream = function (fd, collection, callback) {
@@ -45,7 +46,7 @@ FILER.saveFileStream = function (fd, collection, callback) {
     }
     // streaming overwrites the file each new stream
     if(!this.busyWriteStreaming) {
-        //this.busyWriteStreaming = true;
+        //this.busyWriteStreaming = true; // messes with multiple connections
         console.log('<=> Streaming to:', fd + ' Old File Size:', this.getFilesizeInMBytes(fd));
         console.time('<=> Write File Stream Time');
         this.streamLinesToFile(fd, collection, function(err) {
