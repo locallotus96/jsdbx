@@ -4,7 +4,7 @@
 > Supports indexing on any field(s) for faster searches
   - Indices are dynamically maintained
 
-> Supports queries on multiple fields:  
+> Supports basic queries on multiple fields:  
   - Find One  
   - Find Many  
   -- Match on all fields  
