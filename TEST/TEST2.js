@@ -15,7 +15,7 @@ function test() {
   console.log('<DB> Current Collection: ', db[cName].C_NAME);
   console.log('<DB> Current Records:', db[cName].count());
 
-  insertTestRecords(2500000, cName);
+  insertTestRecords(1000000, cName);
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   db.disconnect(cName, function(err) {

@@ -599,13 +599,11 @@ UTIL.busyWriteStreaming = false; // are we currently streaming to the file?
 
 UTIL.saveCollection = function (fd, collection, callback) {
     console.log('<=> Saving:', collection.length + ' records (not yet filtered for null)');
-    //this.saveFileStream(fd, collection, callback); // faster but we have to json stringify/parse the array and hit a size limit
-    this.saveFileStreamLines(fd, collection, callback);
+    this.saveFileStream(fd, collection, callback);
 }
 
 UTIL.loadCollection = function (fd, callback) {
-    //this.loadFileStream(fd, callback); // faster but we have to json stringify/parse the array and hit a size limit
-    this.loadFileStreamLines(fd, callback);
+    this.loadFileStream(fd, callback);
 }
 
 UTIL.saveFileStream = function (fd, collection, callback) {
@@ -622,38 +620,10 @@ UTIL.saveFileStream = function (fd, collection, callback) {
         console.log('<=> Streaming. Old File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Saving File:', fd);
         console.time('<=> Write File Stream Time');
-        this.streamToFile(fd, collection, function(err) {
+        this.streamLinesToFile(fd, collection, function(err) {
             UTIL.busyWriteStreaming = false;
             console.log('<=> Write File Stream Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
             console.timeEnd('<=> Write File Stream Time');
-            callback(err);
-        });
-    } else {
-        callback(':: Busy write streaming!'); // signal error (we're just busy)
-        return;
-    }
-}
-
-UTIL.saveFileStreamLines = function (fd, collection, callback) {
-    if(collection.length === 0) {
-        callback();
-        return;
-    }
-    // streaming overwrites the file each new stream
-    if(!this.busyWriteStreaming) {
-        console.time('<=> Filter Null Records Time');
-        this.filterDeleted(collection);
-        console.timeEnd('<=> Filter Null Records Time');
-        this.busyWriteStreaming = true;
-        console.log('<=> Streaming lines. Old File Size:', this.getFilesizeInMBytes(fd));
-        console.log('<=> Saving File:', fd);
-        console.time('<=> Write File Stream Lines Time');
-        // very slow, ~30sec for 1mil rec, now ~5sec with writing strings of lines
-        this.streamLinesToFile(fd, collection, function(err) {
-        //this.bufferWriteFileSync(fd, collection, function(err) { // ~2sec for 1mil rec
-            UTIL.busyWriteStreaming = false;
-            console.log('<=> Write File Stream Lines Error:', err + ' New File Size:', UTIL.getFilesizeInMBytes(fd));
-            console.timeEnd('<=> Write File Stream Lines Time');
             callback(err);
         });
     } else {
@@ -670,7 +640,7 @@ UTIL.loadFileStream = function (fd, callback) {
         console.log('<=> Streaming... File Size:', this.getFilesizeInMBytes(fd));
         console.log('<=> Loading File:', fd);
         console.time('<=> Read File Stream Time');
-        this.streamFromFile(fd, function(err, data) {
+        this.streamFromFile3(fd, function(err, data) {
             console.timeEnd('<=> Read File Stream Time');
             if(!err) {
                 if(data.length > 0 && typeof(data) === 'object') {
@@ -687,76 +657,6 @@ UTIL.loadFileStream = function (fd, callback) {
     }
 }
 
-UTIL.loadFileStreamLines = function (fd, callback) {
-    if(!this.isValidPathSync(fd) || !this.canReadWriteSync(fd)) {
-        console.log(':: Error Opening File! Check File Name or Permissions...');
-        callback(true);
-    } else {
-        console.log('<=> Streaming lines... File Size:', this.getFilesizeInMBytes(fd));
-        console.log('<=> Loading File:', fd);
-        console.time('<=> Read File Stream Lines Time');
-        this.streamLinesFromFile(fd, function(err, data) {
-        //this.bufferReadFileSync(fd, function(err, data) { // no real difference to streamLines
-            console.timeEnd('<=> Read File Stream Lines Time');
-            if(!err) {
-                if(data.length > 0 && typeof(data) === 'object') {
-                    console.log('<=> Loaded Collection:', data.length + ' records');
-                    callback(null, data);
-                } else {
-                    callback(null, null); // no error but no data either, empty/new file
-                }
-            } else {
-                console.log('<=> Read File Stream Lines Error:', err + ' File Size:', UTIL.getFilesizeInMBytes(fd));
-                callback(err, null);
-            }
-        });
-    }
-}
-
-UTIL.bufferWriteFileSync = function (fd, data, callback) {
-    if(!data.length && typeof(data) === 'object') { // assuming a single object
-        data = [data];
-    }
-    var o = fs.openSync(fd, 'w');
-    var sout = '', bout;
-    var lCount = 0;
-    var lMax = 1024 < data.length ? 1024 : data.length;
-    console.log('<=> Max lines to buffer', lMax);
-    for(var i = 0; i < data.length; i++) {
-        sout += JSON.stringify(data[i]) + '\n';
-        lCount++;
-        if(lCount === lMax || i === data.length-1) {
-            bout = new Buffer(sout, 'utf8');
-            //console.log('<<<< Writing buffer of length', bout.length + ' bytes');
-            fs.writeSync(o, bout, 0, bout.length);
-            sout = '';
-            lCount = 0;
-        }
-    }
-    fs.closeSync(o);
-    console.log('<=> Done buffer writing to file!');
-    callback(false);
-}
-
-UTIL.bufferReadFileSync = function (fd, callback) {
-    var i = fs.openSync(fd, 'r');
-    var bin = new Buffer(1024 * 1024);
-    var l, len, prev = '';
-    var data = [];
-    while(len = fs.readSync(i, bin, 0, bin.length)) {
-        l = (prev + bin.toString('utf8', 0, len)).split('\n');
-        prev = len === bin.length ? '\n' + l.splice(l.length-1)[0] : '';
-        l.forEach(function(line) {
-            if(!line)
-                return;
-            data[data.length] = JSON.parse(line);
-        });
-    }
-    fs.closeSync(i);
-    console.log('<=> Done buffer reading from file!');
-    callback(null, data);
-}
-
 UTIL.streamToFile = function (fd, data, callback) {
     if(!data.length && typeof(data) === 'object') { // assuming a single object
         data = [data];
@@ -771,10 +671,11 @@ UTIL.streamToFile = function (fd, data, callback) {
         console.log('<=> Done writing to file stream!');
         callback(false); // signal done to callback with no error
     });
-    wstream.write(JSON.stringify(data));
+    wstream.write(JSON.stringify(data)); // warning!!!
     wstream.end(); // emits 'finish' event
 }
 
+// was very slow, ~30sec for 1mil rec, now ~2sec with writing "buffered" strings of lines
 UTIL.streamLinesToFile = function (fd, data, callback) {
     if(!data.length && typeof(data) === 'object') { // assuming a single object
         data = [data];
@@ -815,59 +716,122 @@ UTIL.streamLinesToFile = function (fd, data, callback) {
         }
     }
     write();
-    //data.forEach(function(obj) { // no real performance difference
-    //    wstream.write(JSON.stringify(obj) + '\n');
-    //});
     wstream.end(); // emits 'finish' event
 }
 
-// Reads whole file into data object,
-// that's why we hit a json length limit since everything is one giant json string object
-// javascript can't serialize like other languages...
+// Reads and parse chunks from file as string, then parse the whole string
 UTIL.streamFromFile = function (fd, callback) {
-    //--- Readable Stream
-    var rstream = fs.createReadStream(fd, {'encoding': 'utf-8'});
-    //rstream.setEncoding('utf8');
+    //--- Readable Stream, read whole file very fast
     var data = '';
-    rstream.on('error', function(err) {
+    var rs = fs.createReadStream(fd, {'encoding': 'utf-8', 'bufferSize': 64 * 1024});
+    rs.on('error', function(err) {
         console.error(':: Error reading from file stream!', err);
         callback(err, null);
     });
-    rstream.on('end', function() {
+    rs.on('data', function(chunk) {
+        data += chunk;
+    });
+    rs.on('end', function() {
         console.log('<=> Done reading from file stream!');
         if(data) {
-            callback(null, JSON.parse(data));
+            callback(null, JSON.parse(data)); // warning!!!
         } else {
             callback(null, {});
         }
     });
-    rstream.on('data', function(chunk) {
-        data += chunk;
+}
+
+UTIL.streamFromFile2 = function (fd, callback) {
+    var data = [];
+    var l, len, prev = '';
+    var CHUNK_SIZE = 128 * 1024;
+    // The node implementation forces the buffer size to 64*1024 (65536) bytes
+    // You can even configure the initial size of the buffer by passing: highWatermark: CHUNK_SIZE
+    var rs = fs.createReadStream(fd, {'encoding': 'utf-8', highWatermark: CHUNK_SIZE});
+    rs.on('error', function(err) {
+        console.error(':: Error reading from file stream!', err);
+        callback(err, null);
+    });
+    // This forces the limitation of reading with the internal node buffer size
+    rs.on('data', function(chunk) {
+        len = chunk.length;
+        //console.log(len);
+        l = (prev + chunk).split('\n');
+        prev = len === chunk.length ? '\n' + l.splice(l.length-1)[0] : '';
+        l.forEach(function(line) {
+            if(!line)
+                return;
+            data[data.length] = JSON.parse(line);
+        });
+    });
+    rs.on('end', function() {
+        console.log('<=> Done reading from file stream!');
+        if(data) {
+            callback(null, data);
+        } else {
+            callback(null, {});
+        }
+    });
+}
+
+// Read and parse chunks from file into lines, but much slower, strill faster than streamLines tho
+UTIL.streamFromFile3 = function (fd, callback) {
+    var data = [], chunk;
+    var l, len, prev = '';
+    var CHUNK_SIZE = 128 * 1024;
+    // The node implementation forces the buffer size to 64*1024 (65536) bytes
+    // You can even configure the initial size of the buffer by passing: highWatermark: CHUNK_SIZE
+    var rs = fs.createReadStream(fd, {'encoding': 'utf-8', highWatermark: CHUNK_SIZE});
+    rs.on('error', function(err) {
+        console.error(':: Error reading from file stream!', err);
+        callback(err, null);
+    });
+    // Here we get around the internal buffer limit
+    // If CHUNK_SIZE is larger than the internal buffer,
+    // node will return null and buffer some more before emitting readable again.
+    rs.on('readable', function() {
+        while(null !== (chunk = rs.read(CHUNK_SIZE))) {
+            len = chunk.length;
+            //console.log(len);
+            l = (prev + chunk).split('\n');
+            prev = len === chunk.length ? '\n' + l.splice(l.length-1)[0] : '';
+            l.forEach(function(line) {
+                if(!line)
+                    return;
+                data[data.length] = JSON.parse(line);
+            });
+        }
+    });
+    rs.on('end', function() {
+        console.log('<=> Done reading from file stream!');
+        if(data) {
+            callback(null, data);
+        } else {
+            callback(null, {});
+        }
     });
 }
 
 // Read and parse lines from the file,
-// individual lines aka objects should be json stringified upon insertion
+// individual lines aka json objects should be stringified upon insertion
+// slightly slower than chunked streamFromFile2-3
 UTIL.streamLinesFromFile = function (fd, callback) {
-    // Read lines via stream (slower)
     var data = [];
-    var rl = require('readline').createInterface({
+    var rsl = require('readline').createInterface({
         input: fs.createReadStream(fd, {'encoding': 'utf-8'})
     });
-
-    rl.on('line', function (line) {
+    rsl.on('line', function (line) {
         //console.log('Line from file:\n', line);
         //callback(null, JSON.parse(line));
         data[data.length] = JSON.parse(line);
     });
-
-    rl.on('close', function () {
+    rsl.on('close', function () {
         console.log('<=> Done streaming lines from file!');
         callback(null, data);
     });
 }
 
-// Same performance as streamLinesToFile
+// Same performance as streamLinesFromFile without "buffer"
 /*UTIL.streamLinesFromFile2 = function (fd, callback) {
     var data = [];
     //--- Writable Stream
@@ -887,6 +851,52 @@ UTIL.streamLinesFromFile = function (fd, callback) {
     });
 }*/
 
+// ~ Same performance as streamLinesToFile
+UTIL.bufferWriteFileSync = function (fd, data, callback) {
+    if(!data.length && typeof(data) === 'object') { // assuming a single object
+        data = [data];
+    }
+    var o = fs.openSync(fd, 'w');
+    var sout = '', bout;
+    var lCount = 0;
+    var lMax = 1024 < data.length ? 1024 : data.length;
+    console.log('<=> Max lines to buffer', lMax);
+    for(var i = 0; i < data.length; i++) {
+        sout += JSON.stringify(data[i]) + '\n';
+        lCount++;
+        if(lCount === lMax || i === data.length-1) {
+            bout = new Buffer(sout, 'utf8');
+            //console.log('<<<< Writing buffer of length', bout.length + ' bytes');
+            fs.writeSync(o, bout, 0, bout.length);
+            sout = '';
+            lCount = 0;
+        }
+    }
+    fs.closeSync(o);
+    console.log('<=> Done buffer writing to file!');
+    callback(false);
+}
+
+// ~ Same performance as streamLinesFromFile
+UTIL.bufferReadFileSync = function (fd, callback) {
+    var i = fs.openSync(fd, 'r');
+    var bin = new Buffer(1024 * 1024);
+    var l, len, prev = '';
+    var data = [];
+    while(len = fs.readSync(i, bin, 0, bin.length)) {
+        l = (prev + bin.toString('utf8', 0, len)).split('\n');
+        prev = len === bin.length ? '\n' + l.splice(l.length-1)[0] : '';
+        l.forEach(function(line) {
+            if(!line)
+                return;
+            data[data.length] = JSON.parse(line);
+        });
+    }
+    fs.closeSync(i);
+    console.log('<=> Done buffer reading from file!');
+    callback(null, data);
+}
+
 UTIL.readFromFileSync = function (fd) {
     return fs.readFileSync(fd, 'utf-8');
 }
@@ -902,11 +912,12 @@ UTIL.readFromFileAsync = function (fd, callback) {
     });
 }
 
+// stupid function, copies data in memory
 UTIL.appendToFileAsync = function (fd, data, callback) {
     var buffer = [];
-    if(data.length) {
-        buffer = data.slice();
-    } else {
+    if(data.length) { // get object(s) from array
+        buffer = data.slice(); // copies the data
+    } else { // single object was given
         buffer.push(data);
     }
     this.appendLineAsync(buffer, null, fd, callback);
@@ -920,12 +931,12 @@ UTIL.appendLineAsync = function (buffer, error, fd, callback) {
         callback(err);
         return;
     }
-    var data = buffer.shift();
+    var data = buffer.shift(); // shift out first element
     fs.appendFile(fd, JSON.stringify(data) + '\n', 'utf8', function(err) { // default encodes to utf8
         if(err) {
             console.error(':: Error Appending to File!', err);
             throw err;
-        } else {
+        } else { // loop this function until buffer is empty
             UTIL.appendLineAsync(buffer, err, fd, callback);
         }
     });
