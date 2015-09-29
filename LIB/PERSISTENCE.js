@@ -1,23 +1,28 @@
 'use strict';
+// Global Modules
 var uuid = require('node-uuid');
 var merge = require('merge');
-
-// TODO: new FILER, static UTIL
+// Local Modules
+var UTIL = require('./UTIL.js');
+var FILER = require('./FILER.js');
 
 //--- PERSISTENCE LAYER
 
 module.exports = function() {
   var PERSISTENCE = {};
   var INDEXER = new require('./INDEXER.js')();
-  var UTIL = require('./UTIL.js');
 
   PERSISTENCE.saveCollection = function (fd, collection, callback) {
-      console.log('=> Saving:', collection.length + ' records (not yet filtered for null)');
-      UTIL.saveFileStream(fd, collection, callback);
+      console.log('=> Saving - Filtering null records...');
+      console.time('<=> Filter Null Records Time');
+      UTIL.filterDeleted(collection);
+      console.timeEnd('<=> Filter Null Records Time');
+      console.log('=> Saving:', collection.length + ' records...');
+      FILER.saveFileStream(fd, collection, callback);
   }
 
   PERSISTENCE.loadCollection = function (fd, callback) {
-      UTIL.loadFileStream(fd, callback);
+      FILER.loadFileStream(fd, callback);
   }
 
   // TODO: If obj has _id, check if it exists via index on _id, and check form of _id

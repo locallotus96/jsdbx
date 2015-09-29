@@ -7,12 +7,12 @@
  */
 
 'use strict';
-//global modules
+// Global Modules
 var path = require('path');
 var mkdirp = require('mkdirp');
 
-//local modules
-var UTIL = require('./UTIL.js');
+// Local Modules
+var FILER = require('./FILER.js');
 
 var msg = {
     connect_success: '<DB> Successfully connected to : ',
@@ -28,7 +28,7 @@ var db = {
             callback('Already connected to: ' + path + '/' + collection);
             return;
         }
-        if (UTIL.isValidPath(path)) {
+        if (FILER.isValidPath(path)) {
             var _db = {};
             _db.path = path;
             this._db = _db;
@@ -75,9 +75,9 @@ var db = {
         }
         if (typeof collection === 'string' && collection.length > 0) {
             var p = path.join(this._db.path, (collection.indexOf('.db') >= 0 ? collection : collection + '.db'));
-            if (!UTIL.isValidPath(p)) {
+            if (!FILER.isValidPath(p)) {
                 console.log('<DB> Collection does not exist! Creating...');
-                UTIL.resetFileSync(p);
+                FILER.resetFileSync(p);
             }
             var _c = collection.replace('.db', '');
             this[_c] = new require('./DAL.js')(path.join(this._db.path, (_c + '.db')), _c);

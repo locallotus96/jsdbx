@@ -63,5 +63,4 @@ data is an object of keys/values to merge with a matching object
 
 ### Architecture:
 > <=> JSDBX  
->     :: => new UTIL  
->     :: <=> new DAL(UTIL) => UTIL => new INDEXER => new KDVSET  
+>     :: <=> new DAL() => new PERSISTENCE() => new INDEXER => new KDVSET  

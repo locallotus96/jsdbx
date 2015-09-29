@@ -1,4 +1,4 @@
 #!/bin/bash
 git add .
-git commit -m 'refactor - created persistence module'
+git commit -m 'refactor - working multiple connections'
 git push -u origin master
