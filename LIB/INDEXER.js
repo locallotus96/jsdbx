@@ -3,32 +3,31 @@ var KDVSET = require('./KDVSET');
 
 var INDEXER = {};
 
-INDEXER.INDECES = {};
+INDEXER.INDICES = {};
 
 INDEXER.build = function (field, collection) {
-    var KDV_SET = new KDVSET();
-    this.INDECES[field] = KDV_SET;
+    this.INDICES[field] = new KDVSET();
     for(var i = 0; i < collection.length; i++) {
-        KDV_SET.add(collection[i][field], collection[i]);
+        this.INDICES[field].add(collection[i][field], collection[i]);
     }
 }
 
 INDEXER.add = function (field, obj) {
-    return this.INDECES[field].add(obj[field], obj);
+    return this.INDICES[field].add(obj[field], obj);
 }
 
 INDEXER.get = function (field, key) {
-    return this.INDECES[field].get(key);
+    return this.INDICES[field].get(key);
 }
 
 INDEXER.update = function (field, oldKey, newKey, obj, remove) {
-    return this.INDECES[field].update(oldKey, newKey, obj, remove);
+    return this.INDICES[field].update(oldKey, newKey, obj, remove);
 }
 
 INDEXER.destroy = function(field) {
-    if(this.INDECES[field]) {
-        this.INDECES[field].clear();
-        delete this.INDECES[field]; // delete the reference to our index set
+    if(this.INDICES[field]) {
+        this.INDICES[field].clear();
+        delete this.INDICES[field]; // delete the reference to our index set
         return true;
     } else {
         return false;

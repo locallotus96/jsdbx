@@ -2,3 +2,7 @@ node_modules
 info.txt
 DB
 LIB_BAK
+TEST/DB
+TEST/LINQ
+TEST/queries.js
+TEST/fs-read-write-buffer.js

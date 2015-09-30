@@ -12,13 +12,13 @@ db.connect('DB/TEST', cName, function(err) {
 
 console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
 var cName2 = 'mock';
-db.connect('DB/TEST', cName2, function(err) {
+/*db.connect('DB/TEST', cName2, function(err) {
     if(err) {
         console.log('<DB> Error:', err);
     } else {
         test2();
     }
-});
+});*/
 
 //--------------------------------------------------------------
 function test() {
@@ -138,6 +138,16 @@ function test() {
   console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find Select Limit Time');
+  console.log(db[cName].findAny({ name: 'Corne'}, {select:['name', 'age', 'obj'], limit:2, skip:100}));
+  console.timeEnd(':: Find Select Limit Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
+  console.time(':: Find Any Time');
+  db[cName].findAny({ name: 'Buffer1'});
+  console.timeEnd(':: Find Any Time');
+
+  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   db.disconnect(cName, function(err) {
       if(err) {
           console.error('<DB> Error:', err);
@@ -175,7 +185,8 @@ function insertTestRecords(x, cName) {
           score: i,
           teacher: 'Tim',
           city: 'Cape Town',
-          age: Math.floor((Math.random() * 10000) + 1)
+          age: Math.floor((Math.random() * 100) + 1),
+          obj: {school:'Highschool', nqf:'7'}
       });
   };
   console.timeEnd(':: Insert Time');

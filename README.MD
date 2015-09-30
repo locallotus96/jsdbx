@@ -1,16 +1,34 @@
 # JavaScript DBX
-## (WIP) A little json database in node.js
+## (WIP) A little JSON database in Node.js
 
 > Supports basic queries on multiple fields:  
   - Find One  
   - Find Many  
   -- Match on all fields  
-  -- Match on any field  
+  -- Match on any field
+  - Select specific fields to be included in return documents
+  - Limit no. returned documents to x
+  - Skip x no. of documents to be returned
+  - Sort returned documents by a specific field
 
-> Supports indexing on any field(s) for faster searches
+> Supports indexing on almost any field(s) for faster searches - See Notes section!
   - Indices are dynamically maintained
 
-> Supports connections to multiple collections
+> Supports connections to multiple collections through a single db object
+
+> This is primarily an in-memory database at the moment, only saves on disconnect!
+
+### Dependencies
+
+> (https://www.npmjs.com/package/mkdirp "mkdirp") by (https://github.com/substack "substack")
+> (https://www.npmjs.com/package/merge "merge") by (https://github.com/yeikos "yeikos")
+> (https://www.npmjs.com/package/node-uuid "node-uuid") by (https://github.com/broofa "broofa")
+
+You can run: <?!#$> npm install to install the dependencies in package.json
+
+#### Inspiration
+> (https://www.npmjs.com/package/json_file_system "json_file_system") by (https://github.com/jalalhejazi/jsonfs "jalalhejazi")
+> The NoSQL ecosystem and how databases work
 
 ### API:
 
@@ -64,11 +82,20 @@ used by db.connect()
 used by db.disconnect()  
 > db.collection.save(callback)  
 
+### Notes:
+> Do not index on fields that contain objects (aka embedded documents)!
+> But you can safely embed objects in your doc, you just can't search on the embedded object (yet).
+> You need to disconnect to save the database to file!
+> I'm working on 'live' persistence through the file system...
+> Indices have to be explicitly rebuilt after connecting again
+
 ### Architecture:
+> Where <=> contains methods somehow exposed to the user via quantum something or other
 > <=> JSDBX  
 >     :: <=> new DAL() => new PERSISTENCE() => new INDEXER() => new KDVSET()  
 
 ### Future Plans
 I plan to get this running in it's own server process(s) with a client library you can use to connect to it.
 I'd also like to port it to Python, or parts of it and see how it performs.
-Querying could probably be improved / expanded but this is JavaScript afterall...
+I'm building this for fun!
+Have nice day!

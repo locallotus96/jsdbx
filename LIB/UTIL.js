@@ -4,29 +4,35 @@
 
 var UTIL = {}; // utility object (class)
 
+// How many keys/fields are in this object?
+UTIL.getObjectSize = function (obj) {
+    return Object.keys(obj).length;
+}
+
 /*
     A helper function to return whether or not a document contains
     all fields and values in the query.
 */
 UTIL.matchAll = function (rec, query) {
     for(var p in query) {
-        /*if(!(p in rec) || !(rec[p] === query[p]))) {
+        /*if(!(p in rec) || !(rec[p] === query[p])) {
             return false; // a field didn't match
         }*/
-        // faster ~ 25%
+        // much faster the more fields to test, because key in obj test is slow!!!
         if(!(rec[p] === query[p])) {
             return false; // a field didn't match
         }
     }
     return true; // all fields match
 }
-// Like matchAll but for a single field (~ inverse)
-UTIL.matchOne = function (rec, query) {
+
+// Like matchAll but for any single field
+UTIL.matchAny = function (rec, query) {
     for(var p in query) {
         /*if(p in rec && rec[p] === query[p]) {
             return true; // a field matches
         }*/
-        // faster ~ 25%
+        // much faster the more fields to test, because key in obj test is slow!!!
         if(rec[p] === query[p]) {
             return true; // a field matches
         }
@@ -34,11 +40,26 @@ UTIL.matchOne = function (rec, query) {
     return false; // no fields match
 }
 
-UTIL.getObjectSize = function (obj) {
-    return Object.keys(obj).length;
+// Return a collection with only selected fields in each object
+// query is the selection query, not the find query
+// collection is the result of the find query
+// select is an array of field names
+// TODO: Try modifying array in place by removing fields from each doc
+UTIL.filterSelected = function (collection, select) {
+    return collection.map(function(rec) { // does not modify array in place
+        var newObj = {};
+        var p = '';
+        for(var i = 0; i < select.length; i++) {
+            p = select[i];
+            if(rec[p]) { // select field may not exist in doc
+                newObj[p] = rec[p];
+            }
+        }
+        return newObj;
+    });
 }
 
-// Method to remove all nullified objects from a list
+// Method to remove all nullified objects from a list by checking if _id is null
 UTIL.filterDeleted = function (list) {
     for(var i = 0; i < list.length; i++) {
         if(list[i]._id === null) {
@@ -65,7 +86,7 @@ UTIL.listContains = function (list, obj) {
   Or, similarly, but preserving order:
 */
 // Slightly more consistent algorithm performance-wise
-UTIL.getUniqueElements = function (collection) {
+UTIL.getUniqueElementsByHash = function (collection) {
     var seen = {}; // set containing unique elements
     var result = [];
     var elem, elemStr;
@@ -81,12 +102,27 @@ UTIL.getUniqueElements = function (collection) {
     return result;
 }
 
+// Similar to hash, but based on object ID, and without hashing...
+UTIL.getUniqueElementsByID = function (collection) {
+    var seen = {}; // set containing unique elements
+    var result = [];
+    var elem, elemStr;
+    for (var i = 0; i < collection.length; i++) {
+        elem = collection[i]._id;
+        if (!seen[elem]) {
+            seen[elem] = true;
+            result[result.length] = elem;
+        }
+    }
+    return result;
+}
+
 // Removes duplicate elements from a collection / array
 // Use the notion of a set, which every JavaScript object is an example of.
-// Slightly faster on arrays with more unique elements compared to getUniqueElements()
+// Slightly faster on arrays with more unique elements compared to getUniqueElementsByHash()
 // When not many unique elements are present, this is slower
 // Slows down again when nearly all elements are unique, catch 22...
-UTIL.deduplicate = function (collection) {
+UTIL.deduplicateByHash = function (collection) {
     var set = {};
     for(var i = 0; i < collection.length; i++) {
         // adds or replaces an entry in the set

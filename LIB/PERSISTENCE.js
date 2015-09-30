@@ -32,22 +32,22 @@ module.exports = function() {
           for(var i = 0; i < obj.length; i++) {
               if(!obj[i]['_id'])
                   obj[i]._id = uuid.v4().replace(/-/g, '');
-              for(var p in INDEXER.INDECES) // check if new object contains a field to index on
-                  if(p in obj) // ok there's a field to index on
+              for(var p in INDEXER.INDICES) // check if new object contains a field to index on
+                  if(obj[p]) // ok there's a field to index on
                       INDEXER.add(p, obj); // index this record
           }
       } else { // single object
           if(!obj['_id'])
               obj._id = uuid.v4().replace(/-/g, '')
-          for(var p in INDEXER.INDECES) // check if new object contains a field to index on
-              if(p in obj) // ok there's a field to index on
+          for(var p in INDEXER.INDICES) // check if new object contains a field to index on
+              if(obj[p]) // ok there's a field to index on
                   INDEXER.add(p, obj); // index this record
       }
       return obj;
   }
 
   PERSISTENCE.createIndex = function(field, collection) {
-      if(field in INDEXER.INDECES) {
+      if(INDEXER.INDICES[field]) {
           return false; // index for this field exists
       } else {
           INDEXER.build(field, collection);
@@ -94,10 +94,10 @@ module.exports = function() {
     Unless you pass matchAllFields = true
     If multi = false, the first matching object will be returned
     Note:
-      Indexed searches are faster by roughly a factor of O(O / numIndexedFields), when doing a multi search
-      on one or more indexed and none indexed fields.
+      Indexed searches are faster by roughly a factor of O(numQueryFields / numIndexedFields),
+      when doing a multi search on one or more indexed and none indexed fields.
   */
-  PERSISTENCE.finder = function(collection, query, multi, matchAll) {
+  PERSISTENCE.finder = function(collection, query, multi, matchAll, options) {
       var retDocs = [];
       var rec = {};
       var match = false; // whether or not a record matches the query
@@ -109,7 +109,7 @@ module.exports = function() {
       // INDEX SEARCH
       // check if we have an index for this search query
       for(var p in query) {
-          if(p in INDEXER.INDECES) { // this field is indexed
+          if(INDEXER.INDICES[p]) { // this field is indexed
               indexed = true;
               console.log('=> Query is indexed via', p);
               indexedRecs = INDEXER.get(p, query[p]);
@@ -119,10 +119,9 @@ module.exports = function() {
                       if(matchAll)
                           match = UTIL.matchAll(rec, query);
                       else
-                          match = UTIL.matchOne(rec, query);
+                          match = UTIL.matchAny(rec, query);
                       if(match) {
-                          // check if we've already found this object (multi reference issue)
-                          //if(retDocs.indexOf(rec) >= 0) {
+                          // check if we've already found this object (multi index reference issue)
                           if(UTIL.listContains(retDocs, rec)) {
                               //console.log('UTIL.finder Already found!');
                               continue; // next loop cycle
@@ -165,10 +164,9 @@ module.exports = function() {
               if(matchAll)
                   match = UTIL.matchAll(rec, query);
               else
-                  match = UTIL.matchOne(rec, query);
+                  match = UTIL.matchAny(rec, query);
               if(match) {
-                  // check if we've already found this object (multi reference issue)
-                  //if(retDocs.indexOf(rec) >= 0) {
+                  // check if we've already found this object (multi index reference issue)
                   if(UTIL.listContains(retDocs, rec)) {
                       //console.log('UTIL.finder Already found!!');
                       continue; // next loop cycle
@@ -177,6 +175,35 @@ module.exports = function() {
                   if(!multi) {
                       break;
                   }
+              }
+          }
+      }
+      if(options) {
+          // if we have a selection query, return only those fields from matching docs
+          // TODO: Try modifying array in place by removing fields from each rec
+          // TODO: Try selecting as documents are found, instead of after
+          if(options.select) {
+              // select can either be a string or an array of strings
+              if(typeof(options.select) === 'string')
+                  retDocs = UTIL.filterSelected(retDocs, [options.select]);
+              else if(options.select.length > 0)
+                  retDocs = UTIL.filterSelected(retDocs, options.select);
+          }
+          // don't bother attempting this on single doc searches
+          if(multi) {
+              if(options.sort) {
+                  // selection sort
+                  // quick sort
+              }
+              if(options.limit) {
+                  if(options.skip) {
+                      // skip the first x elements by splicing them away
+                      retDocs.splice(0, options.skip);
+                  }
+                  // splice the array so it contains the first x records, where x is options.limit
+                  // if the limit is 2, start at index 2 and remove elements until the end
+                  // keeping only the first 2 as specified by limit
+                  retDocs.splice(options.limit, retDocs.length);
               }
           }
       }
@@ -196,7 +223,7 @@ module.exports = function() {
       // INDEX SEARCH
       // check if we have an index for this search query
       for(var p in query) {
-          if(p in INDEXER.INDECES) { // this field is indexed
+          if(INDEXER.INDICES[p]) { // this field is indexed
               indexed = true;
               console.log('=> Query is indexed via', p);
               indexedRecs = INDEXER.get(p, query[p]);
@@ -209,11 +236,11 @@ module.exports = function() {
                       if(matchAll)
                           match = UTIL.matchAll(rec, query);
                       else
-                          match = UTIL.matchOne(rec, query);
+                          match = UTIL.matchAny(rec, query);
                       if(match) {
                           // check if we should update any index for this record
-                          for(var p in rec) {
-                              if(p in INDEXER.INDECES) { // this field is indexed
+                          for(var p in INDEXER.INDICES) {
+                              if(rec[p]) { // this field is indexed
                                   //console.log('UTIL.remover Updating indexed key', p);
                                   INDEXER.update(p, rec[p], '', rec, true); // remove indices for any indexed fields in this record
                               }
@@ -256,14 +283,12 @@ module.exports = function() {
               if(matchAll)
                   match = UTIL.matchAll(rec, query);
               else
-                  match = UTIL.matchOne(rec, query);
+                  match = UTIL.matchAny(rec, query);
               if(match) {
-                  // console.log('UTIL.remover Splicing array index:', i);
-                  // splice also mutates the array that calls it.
-                  // and we throw away the new array because we're removing all those records
-                  // console.log(collection.splice(i, 1));
-
-                  // We set each property to null, affecting the underlying memory, now we can't find it!
+                  // Splice is ridiculously slow when we need to remove many records, so we don't use it
+                  // Instead, we set each property value to null, now we can't find it in the collection!
+                  // References pointing to this object are still valid but the data is null
+                  // The indexer should have removed all references by the time we get here anyway
                   for(var p in rec) {
                       rec[p] = null;
                   }
@@ -292,7 +317,7 @@ module.exports = function() {
       // INDEX SEARCH
       // check if we have an index for this search query
       for(var p in query) {
-          if(p in INDEXER.INDECES) { // this field is indexed
+          if(INDEXER.INDICES[p]) { // this field is indexed
               indexed = true;
               console.log('=> Query is indexed via', p);
               indexedRecs = INDEXER.get(p, query[p]);
@@ -303,11 +328,11 @@ module.exports = function() {
                       if(matchAll)
                           match = UTIL.matchAll(rec, query);
                       else
-                          match = UTIL.matchOne(rec, query);
+                          match = UTIL.matchAny(rec, query);
                       if(match) {
                           // check if we should update any index for this record
-                          for(var p in rec) {
-                              if(p in INDEXER.INDECES) { // this field is indexed and changing
+                          for(var p in INDEXER.INDICES) {
+                              if(rec[p]) { // this field is indexed and changing
                                   //console.log('UTIL.updater Updating indexed key', p);
                                   INDEXER.update(p, rec[p], data[p], rec, false);
                               }
@@ -347,7 +372,7 @@ module.exports = function() {
               if(matchAll)
                   match = UTIL.matchAll(rec, query);
               else
-                  match = UTIL.matchOne(rec, query);
+                  match = UTIL.matchAny(rec, query);
               if(match) {
                   collection[i] = merge(rec, data);
                   updated++;

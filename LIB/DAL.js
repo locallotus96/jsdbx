@@ -76,32 +76,32 @@ module.exports = function(file, collectionName) {
       return PERSISTENCE.inserter(this.COLLECTION, data);
   }
 
-  DAL.findOne = function (query) {
+  DAL.findOne = function (query, options) {
       if(!query) {
           return [];
       }
-      return (PERSISTENCE.finder(this.COLLECTION, query, false, true))[0];
+      return (PERSISTENCE.finder(this.COLLECTION, query, false, true, options))[0];
   }
 
-  DAL.findAnyOne = function (query) {
+  DAL.findAnyOne = function (query, options) {
       if(!query) {
           return [];
       }
-      return (PERSISTENCE.finder(this.COLLECTION, query, false, false))[0];
+      return (PERSISTENCE.finder(this.COLLECTION, query, false, false, options))[0];
   }
 
-  DAL.find = function (query) {
+  DAL.find = function (query, options) {
       if(!query) {
           return this.COLLECTION;
       }
-      return PERSISTENCE.finder(this.COLLECTION, query, true, true);
+      return PERSISTENCE.finder(this.COLLECTION, query, true, true, options);
   }
 
-  DAL.findAny = function (query) {
+  DAL.findAny = function (query, options) {
       if(!query) {
           return this.COLLECTION;
       }
-      return PERSISTENCE.finder(this.COLLECTION, query, true, false);
+      return PERSISTENCE.finder(this.COLLECTION, query, true, false, options);
   }
 
   DAL.updateOne = function (query, data) {
