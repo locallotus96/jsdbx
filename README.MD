@@ -97,5 +97,5 @@ used by db.disconnect()
 ### Future Plans
 I plan to get this running in it's own server process(s) with a client library you can use to connect to it.
 I'd also like to port it to Python, or parts of it and see how it performs.
-I'm building this for fun!
-Have nice day!
+
+And finally, i'm just building this for fun.
