@@ -31,7 +31,7 @@ to install the dependencies specified in package.json
 
 #### Inspiration
 > (https://www.npmjs.com/package/json_file_system "json_file_system") by    (https://github.com/jalalhejazi/jsonfs "jalalhejazi")
-> The NoSQL ecosystem and how databases work
+> The NoSQL ecosystem and how databases work    
 
 ### API:
 
