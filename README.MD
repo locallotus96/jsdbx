@@ -72,7 +72,7 @@ options is an object with any combination of these fields: select, limit, skip a
 - select takes a string or an array of strings, containing the names of fields to return
 - limit takes a number to limit the number of returned records by
 - skip takes a number spcifyinh how many found records to skip when returning
-- sort takes a string name of the field to sort records by
+- sort takes an object with a single key, the name of the field to sort records by, and a value, -1 or 1 for descending and ascending respectively
 > find matching all supplied fields:values
 > db.collection.find(query, <options>)  
 > db.collection.findOne(query, <options>)
@@ -81,9 +81,10 @@ options is an object with any combination of these fields: select, limit, skip a
 > db.collection.findAnyOne(query, <options>)
 
 Examples:
+> db.test.find();
 > db.test.find({ name: 'Mike' });
 > db.test.findOne({ age:46 }, {select:'name'});
-> db.test.findAny({ age:20 }, {select:['name', 'age' ], limit:5, skip:15, sort:'age'});
+> db.test.findAny({ age:20 }, {select:['name', 'age' ], limit:5, skip:15, sort:{age:-1});
 
 #### Updating
 data is an object of keys/values to merge with a matching object

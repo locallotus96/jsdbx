@@ -201,6 +201,7 @@ UTIL.swap = function (collection, iOne, iTwo) {
     Binary partition
 */
 UTIL.partition = function (collection, field, left, right) {
+    //console.log(field, left, right);
     /*
         Selecting a pivot (middle) element is also complicated by the existence of integer overflow.
         If the boundary indices of the subarray being sorted are sufficiently large,
@@ -208,47 +209,50 @@ UTIL.partition = function (collection, field, left, right) {
         This can be overcome by using, for example, lo + (hi−lo)/2 to index the middle element, at the cost of more complex arithmetic.
     */
     //var pivot = collection[Math.floor((right + left) / 2)]; // middle index
-    var pivot = collection[Math.floor(left + (right - left) / 2)][field]; // middle index
+    var pivot = collection[Math.floor(left + (right - left) / 2)]; // middle object
     var i = left; // starts from left and goes to pivot index
     var j = right; // starts from right and goes to pivot index
     // while the two indices don't match (not converged)
     while(i <= j) {
-        while(collection[i][field] < pivot) {
+        while(collection[i][field] < pivot[field]) {
             i++;
         }
-        while(collection[j][field] > pivot) {
+        while(collection[j][field] > pivot[field]) {
             j--;
         }
         // if the two indices still don't match, swap the values
         if(i <= j) {
-            this.swap(collection, i, j);
+            this.swap(collection, i, j); // only thing changes between orders
             // change indices to continue loop
             i++;
             j--;
         }
     }
-    // necessary for recursion
     return i;
 }
 
 /*
     Quicksort implementation.
     collection (array of objects) is sorted in place
-    field (string) is the property of each object by which to sort on eg: '_id'
+    field (key/val) is the property of each object by which to sort on,
+    -1 for descending, 1 for ascending eg: {_id:-1}
 */
-UTIL.quickSort = function (collection, field, left, right) {
+UTIL.quickSort = function (collection, sort, left, right) {
     var index;
+    var field;
     if(collection.length > 1) {
+        // TODO: Find better way of getting field since this function is called recusively
+        field = Object.keys(sort)[0];
         // incase left and right aren't provided
         left = (typeof left != "number" ? 0 : left);
         right = (typeof right != "number" ? collection.length-1 : right);
         // split up the array
         index = this.partition(collection, field, left, right);
         if(left < index-1) {
-            this.quickSort(collection, field, left, index-1);
+            this.quickSort(collection, sort, left, index-1);
         }
         if(index < right) {
-            this.quickSort(collection, field, index, right);
+            this.quickSort(collection, sort, index, right);
         }
     }
     return collection;
@@ -281,6 +285,29 @@ UTIL.selectionSort = function (collection, field) {
         }
     }
     return collection;
+}
+
+// Reverse an array in place
+// Aka 'for push then splice' - Extremely slow on v8,
+// native reverse() is very well optimized in C/Assembly and uses memory blocked scoping
+// Benchmarks: http://jsperf.com/js-array-reverse-vs-while-loop/5
+// The built in array.reverse method is ~ 97% slower
+UTIL.reverseList = function (list) {
+    var length = list.length;
+    for(length -= 2; length > -1; length -= 1) {
+          list.push(list[length]);
+          list.splice(length, 1);
+    }
+    return list;
+}
+
+// return new copied list
+// Very fast but still slower than native array.splice() method
+UTIL.copyList = function (list) {
+    var i = list.length;
+    var b = [];
+    while (i--) b[i] = list[i];
+    return b;
 }
 
 module.exports = UTIL;

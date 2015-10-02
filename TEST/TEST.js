@@ -139,7 +139,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Select Limit Time');
-  console.log(db[cName].findAny({ age:20 }, {select:['name', 'age', 'obj'], limit:5, skip:100, sort:'nqflevel'}));
+  console.log(db[cName].findAny({ age:20 }, {select:['name', 'age', 'iq', 'obj'], limit:5, skip:100, sort:{iq:-1}}));
   console.timeEnd(':: Find Select Limit Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
@@ -177,10 +177,11 @@ function insertTestRecords(x, cName) {
           name: 'Tim' + i,
           surname: 'Richards' + i,
           //password: crypto.randomBytes(8),
-          score: i,
+          score: i, // index
           teacher: 'Bob',
           city: 'Cape Town',
           age: Math.floor((Math.random() * 100) + 1),
+          iq: Math.floor((Math.random() * 2000) - 1000),
           obj: {school:'Highschool', nqflevel:(Math.ceil(Math.random() * 9)+1)}
       });
   };

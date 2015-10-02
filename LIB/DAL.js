@@ -92,14 +92,14 @@ module.exports = function(file, collectionName) {
 
   DAL.find = function (query, options) {
       if(!query) {
-          return this.COLLECTION;
+          return this.COLLECTION.slice(); // return a copy
       }
       return PERSISTENCE.finder(this.COLLECTION, query, true, true, options);
   }
 
   DAL.findAny = function (query, options) {
       if(!query) {
-          return this.COLLECTION;
+          return this.COLLECTION.slice(); // return a copy
       }
       return PERSISTENCE.finder(this.COLLECTION, query, true, false, options);
   }

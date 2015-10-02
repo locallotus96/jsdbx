@@ -182,36 +182,50 @@ module.exports = function() {
           // if we have a selection query, return only those fields from matching docs
           // TODO: Try modifying array in place by removing fields from each rec
           // TODO: Try selecting as documents are found, instead of after
-          if(options.select) {
+          if(options.select && !multi) { // !multi, because this will break sort
               // select can either be a string or an array of strings
               console.log('=> Selecting', options.select);
               if(typeof(options.select) === 'string')
                   retDocs = UTIL.filterSelected(retDocs, [options.select]);
               else if(options.select.length > 0)
                   retDocs = UTIL.filterSelected(retDocs, options.select);
-          }
-          // don't bother attempting this on single doc searches
-          if(multi) {
-              // sort before limiting and skipping
-              if(options.sort) {
-                  // selection sort
-                  // quick sort
-                  if(typeof(options.sort) === 'string') {
-                      console.log('=> Sorting on', options.sort);
-                      UTIL.quickSort(retDocs, options.sort);
+          } else {
+              // don't bother attempting this on single doc searches
+              if(multi) {
+                  // sort before limiting, skipping or selecting
+                  if(options.sort) {
+                      var sort = options.sort;
+                      // TODO: find avg fastest sort algorithm
+                      // quick sort the array in place
+                      if(typeof(sort) === 'object') { // check for sort:{field:order}
+                          console.log('=> Sorting on', sort);
+                          UTIL.quickSort(retDocs, sort); // quickSort is ascending
+                          if(sort[Object.keys(sort)[0].toString()] === -1) { // we want descending
+                              retDocs.reverse(); // // reverse the array in place, very fast in v8
+                          }
+                      }
                   }
-              }
-              // skip before limiting
-              if(options.skip && typeof(options.skip) === 'number') {
-                  // skip the first x elements by splicing them away
-                  retDocs.splice(0, options.skip);
-              }
-              if(options.limit && typeof(options.limit) === 'number') {
-
-                  // splice the array so it contains the first x records, where x is options.limit
-                  // if the limit is 2, start at index 2 and remove elements until the end
-                  // keeping only the first 2 as specified by limit
-                  retDocs.splice(options.limit, retDocs.length);
+                  if(options.select) { // now we can select, skip and limit since we need only indices..
+                      // select can either be a string or an array of strings
+                      console.log('=> Selecting', options.select);
+                      if(typeof(options.select) === 'string')
+                          retDocs = UTIL.filterSelected(retDocs, [options.select]);
+                      else if(options.select.length > 0)
+                          retDocs = UTIL.filterSelected(retDocs, options.select);
+                  }
+                  // skip before limiting
+                  if(options.skip && typeof(options.skip) === 'number') {
+                      console.log('=> Skipping', options.skip);
+                      // skip the first x elements by splicing them away
+                      retDocs.splice(0, options.skip);
+                  }
+                  if(options.limit && typeof(options.limit) === 'number') {
+                      console.log('=> Limiting', options.limit);
+                      // splice the array so it contains the first x records, where x is options.limit
+                      // if the limit is 2, start at index 2 and remove elements until the end
+                      // keeping only the first 2 as specified by limit
+                      retDocs.splice(options.limit, retDocs.length);
+                  }
               }
           }
       }
