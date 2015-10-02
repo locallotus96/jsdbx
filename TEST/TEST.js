@@ -139,7 +139,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Select Limit Time');
-  console.log(db[cName].findAny({ age:20 }, {select:['name', 'age', 'obj'], limit:5, skip:100, sort:'age'}));
+  console.log(db[cName].findAny({ age:20 }, {select:['name', 'age', 'obj'], limit:5, skip:100, sort:'nqflevel'}));
   console.timeEnd(':: Find Select Limit Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')

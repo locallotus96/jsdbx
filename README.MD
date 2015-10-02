@@ -31,7 +31,7 @@ to install the dependencies specified in package.json
 
 #### Inspiration
 > (https://www.npmjs.com/package/json_file_system "json_file_system") by    (https://github.com/jalalhejazi/jsonfs "jalalhejazi")
-> The NoSQL ecosystem and how databases work    
+> The NoSQL ecosystem and how databases work
 
 ### API:
 
@@ -55,16 +55,16 @@ Example:
 > })
 
 #### Creating / Removing indices
-key is a string of the field/property name to index on  
-> db.collection.createIndex(key)  
-> db.collection.removeIndex(key)  
+key is a string of the field/property name to index on
+> db.collection.createIndex(key)
+> db.collection.removeIndex(key)
 
 Example:
 > db.test.createIndex('name');
 
 #### Inserting data
 data can be a single object or an array of objects
-> db.collection.insert(data)  
+> db.collection.insert(data)
 
 #### Finding
 query is an object with keys/values to search for  
@@ -73,10 +73,12 @@ options is an object with any combination of these fields: select, limit, skip a
 - limit takes a number to limit the number of returned records by
 - skip takes a number spcifyinh how many found records to skip when returning
 - sort takes a string name of the field to sort records by
-> db.collection.find(query, <options>)  // find matching all supplied fields:values
-> db.collection.findOne(query, <options>)  
-> db.collection.findAny(query, <options>)  // find matching any supplied field:value
-> db.collection.findAnyOne(query, <options>)  
+> find matching all supplied fields:values
+> db.collection.find(query, <options>)  
+> db.collection.findOne(query, <options>)
+> find matching any supplied field:value
+> db.collection.findAny(query, <options>)  
+> db.collection.findAnyOne(query, <options>)
 
 Examples:
 > db.test.find({ name: 'Mike' });
@@ -84,8 +86,8 @@ Examples:
 > db.test.findAny({ age:20 }, {select:['name', 'age' ], limit:5, skip:15, sort:'age'});
 
 #### Updating
-data is an object of keys/values to merge with a matching object  
-> db.collection.update(query, data)  
+data is an object of keys/values to merge with a matching object
+> db.collection.update(query, data)
 > db.collection.updateOne(query, data)  
 > db.collection.updateAny(query, data)  
 > db.collection.updateAnyOne(query, data)  
