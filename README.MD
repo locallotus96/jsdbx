@@ -30,8 +30,7 @@ You can run:
 to install the dependencies specified in package.json
 
 #### Inspiration
-> My fellow coder Tyrell
-> (https://www.npmjs.com/package/json_file_system "json_file_system") by (https://github.com/jalalhejazi/jsonfs "jalalhejazi")
+> (https://www.npmjs.com/package/json_file_system "json_file_system") by    (https://github.com/jalalhejazi/jsonfs "jalalhejazi")
 > The NoSQL ecosystem and how databases work
 
 ### API:
