@@ -178,12 +178,13 @@ module.exports = function() {
               }
           }
       }
-      if(options) {
+      if(options && retDocs.length > 0) {
           // if we have a selection query, return only those fields from matching docs
           // TODO: Try modifying array in place by removing fields from each rec
           // TODO: Try selecting as documents are found, instead of after
           if(options.select) {
               // select can either be a string or an array of strings
+              console.log('=> Selecting', options.select);
               if(typeof(options.select) === 'string')
                   retDocs = UTIL.filterSelected(retDocs, [options.select]);
               else if(options.select.length > 0)
@@ -191,15 +192,22 @@ module.exports = function() {
           }
           // don't bother attempting this on single doc searches
           if(multi) {
+              // sort before limiting and skipping
               if(options.sort) {
                   // selection sort
                   // quick sort
-              }
-              if(options.limit) {
-                  if(options.skip) {
-                      // skip the first x elements by splicing them away
-                      retDocs.splice(0, options.skip);
+                  if(typeof(options.sort) === 'string') {
+                      console.log('=> Sorting on', options.sort);
+                      UTIL.quickSort(retDocs, options.sort);
                   }
+              }
+              // skip before limiting
+              if(options.skip && typeof(options.skip) === 'number') {
+                  // skip the first x elements by splicing them away
+                  retDocs.splice(0, options.skip);
+              }
+              if(options.limit && typeof(options.limit) === 'number') {
+
                   // splice the array so it contains the first x records, where x is options.limit
                   // if the limit is 2, start at index 2 and remove elements until the end
                   // keeping only the first 2 as specified by limit

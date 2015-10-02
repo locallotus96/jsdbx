@@ -187,6 +187,7 @@ UTIL.binarySearch = function (collection, query) {
 }
 
 /*
+    Swap two elements of an array in place
     Used in quick-sort implementation in UTIL.partition()
     Used in selection-sort implementation in UTIL.selectionSort()
 */
@@ -197,6 +198,7 @@ UTIL.swap = function (collection, iOne, iTwo) {
 }
 /*
     Used in quicksort implementation in UTIL.quickSort()
+    Binary partition
 */
 UTIL.partition = function (collection, field, left, right) {
     /*
@@ -234,7 +236,6 @@ UTIL.partition = function (collection, field, left, right) {
     collection (array of objects) is sorted in place
     field (string) is the property of each object by which to sort on eg: '_id'
 */
-// TODO: Does it still work?
 UTIL.quickSort = function (collection, field, left, right) {
     var index;
     if(collection.length > 1) {
@@ -261,7 +262,7 @@ UTIL.quickSort = function (collection, field, left, right) {
   Similar to bubble sort,it uses two loops to accomplish the task,
   ultimately resulting in the O(n2) complexity.
 */
-// TODO: Does it still work?
+// TODO: Fix
 UTIL.selectionSort = function (collection, field) {
     var len = collection.length;
     var min, i, j;

@@ -44,7 +44,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
-  db[cName].findAny({ name: 'Buffer50000', score: 99650, teacher: 'None', age: 50, surname: 'Underrun66000', city: 'None' });
+  db[cName].findAny({ name: 'Tim50000', score: 99650, teacher: 'None', age: 50, surname: 'Richards66000', city: 'None' });
   console.timeEnd(':: Find Any Time');
 
   //console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
@@ -54,12 +54,12 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
-  db[cName].findAny({ name: 'Buffer50000', score: 99650, teacher: 'None', age: 50, surname: 'Underrun66000', city: 'None' });
+  db[cName].findAny({ name: 'Tim50000', score: 99650, teacher: 'None', age: 50, surname: 'Richards66000', city: 'None' });
   console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
-  db[cName].findAny({ name: 'Buffer50000', score: 99650 });
+  db[cName].findAny({ name: 'Tim50000', score: 99650 });
   console.timeEnd(':: Find Any Time');
 
   //console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
@@ -69,17 +69,17 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
-  db[cName].findAny({ name: 'Buffer50000', score: 99650 });
+  db[cName].findAny({ name: 'Tim50000', score: 99650 });
   console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find One Time');
-  db[cName].findOne({ name: 'Buffer50000', score: 50000, teacher: 'Tim', city: 'Cape Town' });
+  db[cName].findOne({ name: 'Tim50000', score: 50000, teacher: 'Bob', city: 'Cape Town' });
   console.timeEnd(':: Find One Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Time');
-  db[cName].find({ name: 'Buffer50000', score: 50000, teacher: 'Tim', city: 'Cape Town' });
+  db[cName].find({ name: 'Tim50000', score: 50000, teacher: 'Bob', city: 'Cape Town' });
   console.timeEnd(':: Find Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
@@ -124,7 +124,7 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Any Time');
-  db[cName].findAny({ age: 50, name: 'Buffer10000' });
+  db[cName].findAny({ age: 50, name: 'Tim10000' });
   console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
@@ -139,13 +139,8 @@ function test() {
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   console.time(':: Find Select Limit Time');
-  console.log(db[cName].findAny({ name: 'Corne'}, {select:['name', 'age', 'obj'], limit:2, skip:100}));
+  console.log(db[cName].findAny({ age:20 }, {select:['name', 'age', 'obj'], limit:5, skip:100, sort:'age'}));
   console.timeEnd(':: Find Select Limit Time');
-
-  console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-  console.time(':: Find Any Time');
-  db[cName].findAny({ name: 'Buffer1'});
-  console.timeEnd(':: Find Any Time');
 
   console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
   db.disconnect(cName, function(err) {
@@ -179,14 +174,14 @@ function insertTestRecords(x, cName) {
   console.time(':: Insert Time');
   for (var i = 0; i < x; i++) {
       db[cName].insert({
-          name: 'Buffer' + i,
-          surname: 'Underrun' + i,
+          name: 'Tim' + i,
+          surname: 'Richards' + i,
           //password: crypto.randomBytes(8),
           score: i,
-          teacher: 'Tim',
+          teacher: 'Bob',
           city: 'Cape Town',
           age: Math.floor((Math.random() * 100) + 1),
-          obj: {school:'Highschool', nqf:'7'}
+          obj: {school:'Highschool', nqflevel:(Math.ceil(Math.random() * 9)+1)}
       });
   };
   console.timeEnd(':: Insert Time');

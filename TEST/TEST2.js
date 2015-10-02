@@ -32,13 +32,14 @@ function insertTestRecords(x, cName) {
   console.time(':: Insert Time');
   for (var i = 0; i < x; i++) {
       db[cName].insert({
-          name: 'Buffer' + i,
-          surname: 'Underrun' + i,
+          name: 'Tim' + i,
+          surname: 'Richards' + i,
           //password: crypto.randomBytes(8),
           score: i,
-          teacher: 'Tim',
+          teacher: 'Bob',
           city: 'Cape Town',
-          age: Math.floor((Math.random() * 10000) + 1)
+          age: Math.floor((Math.random() * 100) + 1),
+          obj: {school:'Highschool', nqflevel:(Math.ceil(Math.random() * 9)+1)}
       });
   };
   console.timeEnd(':: Insert Time');
