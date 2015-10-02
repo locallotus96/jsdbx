@@ -195,12 +195,11 @@ module.exports = function() {
                   // sort before limiting, skipping or selecting
                   if(options.sort) {
                       var sort = options.sort;
-                      // TODO: find avg fastest sort algorithm
                       // quick sort the array in place
                       if(typeof(sort) === 'object') { // check for sort:{field:order}
                           console.log('=> Sorting on', sort);
                           UTIL.quickSort(retDocs, sort); // quickSort is ascending
-                          if(sort[Object.keys(sort)[0].toString()] === -1) { // we want descending
+                          if(sort[Object.keys(sort)[0].toString()] === -1) { // we want descending order
                               retDocs.reverse(); // // reverse the array in place, very fast in v8
                           }
                       }

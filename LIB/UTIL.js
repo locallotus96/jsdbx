@@ -196,6 +196,7 @@ UTIL.swap = function (collection, iOne, iTwo) {
     collection[iOne] = collection[iTwo];
     collection[iTwo] = temp;
 }
+
 /*
     Used in quicksort implementation in UTIL.quickSort()
     Binary partition
@@ -231,11 +232,20 @@ UTIL.partition = function (collection, field, left, right) {
     return i;
 }
 
+// SORTING ALGORITHMS
+/*
+"The best sorts are Quick Sort, Heap Sort and Merge Sort.
+Most say that Quick sort is the fastest, but Merge Sort has the time complexity of O(n log n)
+and so does Heap Sort, even with the worst case."
+*/
+
 /*
     Quicksort implementation.
     collection (array of objects) is sorted in place
-    field (key/val) is the property of each object by which to sort on,
+    field (key/val) object is the property of each object by which to sort on,
     -1 for descending, 1 for ascending eg: {_id:-1}
+
+    Fastest algorithm together with Heap Sort and Merge Sort
 */
 UTIL.quickSort = function (collection, sort, left, right) {
     var index;
@@ -265,8 +275,9 @@ UTIL.quickSort = function (collection, sort, left, right) {
 
   Similar to bubble sort,it uses two loops to accomplish the task,
   ultimately resulting in the O(n2) complexity.
+
+  Very slow algorithm... Slows down tremendously > 10 000 elements
 */
-// TODO: Fix
 UTIL.selectionSort = function (collection, field) {
     var len = collection.length;
     var min, i, j;
@@ -302,7 +313,7 @@ UTIL.reverseList = function (list) {
 }
 
 // return new copied list
-// Very fast but still slower than native array.splice() method
+// Very fast but still slower than native array.slice() method
 UTIL.copyList = function (list) {
     var i = list.length;
     var b = [];
