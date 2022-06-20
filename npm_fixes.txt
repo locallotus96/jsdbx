@@ -1,0 +1,75 @@
+
+# Make issues
+sudo apt-get install -y build-essential
+
+# Node-gyp hell
+sudo node-gyp configure && sudo node-gyp rebuild
+
+sudo apt-get purge --auto-remove node-gyp
+sudo npm install -g node-gyp
+
+# try the following command when encountering permission issues
+sudo npm install --unsafe-perm
+
+# if it doesn't work try the following
+sudo rm -rf ~/.node-gyp
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
+sudo npm install --unsafe-perm
+
+# OR try
+sudo rm -rf ~/.node-gyp/
+sudo rm -r node_modules/.bin/;
+sudo rm -r build/
+sudo npm cache clean
+
+sudo npm install -g node-gyp
+sudo npm install -g node-pre-gyp
+
+# NPM Audit
+sudo npm i --package-lock-only
+sudo npm audit fix --force
+
+# Update npm
+sudo npm uninstall npm -g
+sudo npm install -g npm@8.12.2
+
+# Alternative install command
+sudo npm install --unsafe-perm=true --allow-root
+
+# Dependency vs node version issues
+
+When I try to run npm install command in older project, I faced the same issues and I resolved it by updating the dependencies in package.json to latest version by following the steps:
+
+    delete node_modules and package-lock.json
+
+    install npm-check-updates globally, to update all packages to a new major version
+
+    run npm install -g npm-check-updates
+
+    run ncu -u to update dependencies in package.json to latest version
+
+    note: you can use npm update, but npm update doesn't update to latest version
+
+    run npm install
+
+
+
+# NVM Issues and using NVM
+
+1. I removed nvm by command : sudo apt-get remove nvm
+
+then:
+
+git clone https://github.com/creationix/nvm.git ~/nvm
+//For start node you have to run this command every time if you do not add in .profile etc
+. ~/nvm/nvm.sh
+// Now Install latest stable version of NodeJS
+sudo nvm install v5.7.1
+// Check installed nodejs version
+sudo nvm ls
+//You can set which nodejs version you want to use
+sudo nvm use v5.7
+
+

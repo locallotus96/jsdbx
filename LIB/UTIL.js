@@ -69,7 +69,7 @@ UTIL.filterDeleted = function (list) {
     return list;
 }
 
-// Method to return whether or not a list contains an object
+// Method to return whether or not a list contains an object / value
 UTIL.listContains = function (list, obj) {
     for(var i = 0; i < list.length; i++) {
         if(list[i] === obj) {
@@ -77,6 +77,57 @@ UTIL.listContains = function (list, obj) {
         }
     }
     return false;
+}
+
+// Method to return whether or not a list contains an object with _id key
+UTIL.listContainsByID = function (list, obj) {
+    var id = obj._id;
+    for(var i = 0; i < list.length; i++) {
+        if(list[i]._id === id) {
+            return true;
+        }
+    }
+    return false;
+}
+
+UTIL.listContainsByBLKID = function (list, blki) {
+    for(var i = 0; i < list.length; i++) {
+        if(list[i]._blki === blki) {
+            return true;
+        }
+    }
+    return false;
+}
+
+UTIL.sumOnField = function (list, field) {
+    var sum = 0;
+    for(var i = 0; i < list.length; i++) {
+        sum += list[i][field];
+    }
+    return sum;
+}
+
+// Reverse an array in place
+// Aka 'for push then splice' - Extremely slow on v8,
+// native reverse() is very well optimized in C/Assembly and uses memory blocked scoping
+// Benchmarks: http://jsperf.com/js-array-reverse-vs-while-loop/5
+// The built in array.reverse method is ~ 97% slower
+UTIL.reverseList = function (list) {
+    var length = list.length;
+    for(length -= 2; length > -1; length -= 1) {
+          list.push(list[length]);
+          list.splice(length, 1);
+    }
+    return list;
+}
+
+// return new copied list
+// Very fast but still slower than native array.slice() method
+UTIL.copyList = function (list) {
+    var i = list.length;
+    var b = [];
+    while (i--) b[i] = list[i];
+    return b;
 }
 
 /*
@@ -214,19 +265,37 @@ UTIL.partition = function (collection, field, left, right) {
     var i = left; // starts from left and goes to pivot index
     var j = right; // starts from right and goes to pivot index
     // while the two indices don't match (not converged)
-    while(i <= j) {
-        while(collection[i][field] < pivot[field]) {
-            i++;
+    if(field) {
+        while(i <= j) {
+            while(collection[i][field] < pivot[field]) {
+                i++;
+            }
+            while(collection[j][field] > pivot[field]) {
+                j--;
+            }
+            // if the two indices still don't match, swap the values
+            if(i <= j) {
+                this.swap(collection, i, j); // only thing changes between orders
+                // change indices to continue loop
+                i++;
+                j--;
+            }
         }
-        while(collection[j][field] > pivot[field]) {
-            j--;
-        }
-        // if the two indices still don't match, swap the values
-        if(i <= j) {
-            this.swap(collection, i, j); // only thing changes between orders
-            // change indices to continue loop
-            i++;
-            j--;
+    } else {
+        while(i <= j) {
+            while(collection[i] < pivot) {
+                i++;
+            }
+            while(collection[j] > pivot) {
+                j--;
+            }
+            // if the two indices still don't match, swap the values
+            if(i <= j) {
+                this.swap(collection, i, j); // only thing changes between orders
+                // change indices to continue loop
+                i++;
+                j--;
+            }
         }
     }
     return i;
@@ -234,9 +303,11 @@ UTIL.partition = function (collection, field, left, right) {
 
 // SORTING ALGORITHMS
 /*
-"The best sorts are Quick Sort, Heap Sort and Merge Sort.
-Most say that Quick sort is the fastest, but Merge Sort has the time complexity of O(n log n)
-and so does Heap Sort, even with the worst case."
+The best sorts are Quick Sort, Heap Sort and Merge Sort.
+Most say that Quick sort is the fastest, has the time complexity of O(n log n),
+even with the worst case, but so does Merge Sort and Heap Sort.
+
+Quicksort has O(n log n) time average case and sorts in place
 */
 
 /*
@@ -244,15 +315,13 @@ and so does Heap Sort, even with the worst case."
     collection (array of objects) is sorted in place
     field (key/val) object is the property of each object by which to sort on,
     -1 for descending, 1 for ascending eg: {_id:-1}
-
-    Fastest algorithm together with Heap Sort and Merge Sort
 */
 UTIL.quickSort = function (collection, sort, left, right) {
     var index;
-    var field;
+    var field = sort;
     if(collection.length > 1) {
         // TODO: Find better way of getting field since this function is called recusively
-        field = Object.keys(sort)[0];
+        //field = Object.keys(sort)[0];
         // incase left and right aren't provided
         left = (typeof left != "number" ? 0 : left);
         right = (typeof right != "number" ? collection.length-1 : right);
@@ -285,9 +354,17 @@ UTIL.selectionSort = function (collection, field) {
         // set minimum to this position
         min = i;
         //check the rest of the array to see if anything is smaller
-        for(j = i+1; j < len; j++) {
-            if(collection[j][field] < collection[min][field]) {
-                min = j;
+        if(field) { // NOTE: Field check should happen for outside for loop, this checks on each itteration
+            for(j = i+1; j < len; j++) {
+                if(collection[j][field] < collection[min][field]) {
+                    min = j;
+                }
+            }
+        } else {
+            for(j = i+1; j < len; j++) {
+                if(collection[j] < collection[min]) {
+                    min = j;
+                }
             }
         }
         // if the minimum isn't in the position, swap it
@@ -296,29 +373,6 @@ UTIL.selectionSort = function (collection, field) {
         }
     }
     return collection;
-}
-
-// Reverse an array in place
-// Aka 'for push then splice' - Extremely slow on v8,
-// native reverse() is very well optimized in C/Assembly and uses memory blocked scoping
-// Benchmarks: http://jsperf.com/js-array-reverse-vs-while-loop/5
-// The built in array.reverse method is ~ 97% slower
-UTIL.reverseList = function (list) {
-    var length = list.length;
-    for(length -= 2; length > -1; length -= 1) {
-          list.push(list[length]);
-          list.splice(length, 1);
-    }
-    return list;
-}
-
-// return new copied list
-// Very fast but still slower than native array.slice() method
-UTIL.copyList = function (list) {
-    var i = list.length;
-    var b = [];
-    while (i--) b[i] = list[i];
-    return b;
 }
 
 module.exports = UTIL;

@@ -1,34 +1,6 @@
 'use strict';
 // Global Modules
 var fs = require('fs');
-var stream = require('stream');
-var inherits = require('util').inherits;
-
-//=====================================================
-// Create a sink (where the data goes)
-var WRITABLE = stream.Writable;
-
-function Sink(options) {
-    WRITABLE.call(this, options);
-}
-inherits(Sink, WRITABLE);
-
-Sink.prototype._write = function (chunk, encoding, callback) {
-    //TODO: Write to specific file here
-    console.log(chunk.toString());
-    callback();
-}
-
-// Create a Source stream to which to send new lines
-var READABLE = stream.Readable;
-var STREAM_INSERT = new READABLE; // SOURCE_INSERT
-var STREAM_UPDATE = new READABLE; // SOURCE_UPDATE
-var STREAM_DELETE = new READABLE; // SOURCE_DELETE
-
-var SINK_INSERT = new Sink;
-var SINK_UPDATE = new Sink;
-var SINK_DELETE = new Sink;
-//=====================================================
 
 //--- ===================================================================
 //--- FILE OPERATIONS ===================================================
@@ -219,7 +191,6 @@ FILER.streamFromFile3 = function (fd, callback) {
     rs.on('readable', function() {
         while(null !== (chunk = rs.read(CHUNK_SIZE))) {
             len = chunk.length;
-            //console.log(len);
             l = (prev + chunk).split('\n');
             prev = len === chunk.length ? '\n' + l.splice(l.length-1)[0] : '';
             l.forEach(function(line) {
@@ -339,7 +310,7 @@ FILER.readFromFileAsync = function (fd, callback) {
     });
 }
 
-// stupid function, copies data in memory
+// copies data in memory / buffers
 FILER.appendToFileAsync = function (fd, data, callback) {
     var buffer = [];
     if(data.length) { // get object(s) from array

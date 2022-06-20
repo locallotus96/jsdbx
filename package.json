@@ -9,8 +9,17 @@
   "author": "Corne Rossouw",
   "license": "ISC",
   "dependencies": {
-    "merge": "^1.2.0",
-    "mkdirp": "^0.5.1",
-    "node-uuid": "^1.4.3"
+    "cache-chunk-store": "*",
+    "fd-chunk-store": "^*",
+    "fifo": "*",
+    "fs-chunk-store": "*",
+    "gc-stats": "*",
+    "lru-cache": "*",
+    "merge": "*",
+    "mkdirp": "*",
+    "mmap-io": "*",
+    "mmap.js": "*",
+    "node-uuid": "*",
+    "paralleljs": "*"
   }
 }

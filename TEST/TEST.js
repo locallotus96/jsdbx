@@ -1,5 +1,11 @@
 var db = require('../LIB/JSDBX.js');
 
+/*var gc = new (require('gc-stats'))();
+
+gc.on('stats', function(stats) {
+    console.log('GC Happened', stats);
+});*/
+
 console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
 var cName = 'test';
 db.connect('DB/TEST', cName, function(err) {

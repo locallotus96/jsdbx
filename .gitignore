@@ -1,8 +1,5 @@
 node_modules
 info.txt
 DB
-LIB_BAK
-TEST/DB
-TEST/LINQ
-TEST/MOCK.js
-TEST/fs-read-write-buffer.js
+LIB_BAK*
+MOCKS/
